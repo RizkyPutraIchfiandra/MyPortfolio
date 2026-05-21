@@ -89,9 +89,11 @@ function Band({ maxSpeed = 50, minSpeed = 10 }) {
   );
   const [dragged, drag] = useState<any>(false);
   const [hovered, hover] = useState(false);
-  const [size, setSize] = useState<[number, number]>([window.innerWidth, window.innerHeight]);
+  const [size, setSize] = useState<[number, number]>([1920, 1080]);
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
+    setSize([window.innerWidth, window.innerHeight]);
     const onResize = () => setSize([window.innerWidth, window.innerHeight]);
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
