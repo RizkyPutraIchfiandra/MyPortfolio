@@ -1,0 +1,4075 @@
+A.	Text Animation Documentation
+1.	Blur Text
+CLI	: npx shadcn@latest add @react-bits/BlurText-JS-CSS
+Usage	: 
+import BlurText from "./BlurText";
+
+const handleAnimationComplete = () => {
+  console.log('Animation completed!');
+};
+
+<BlurText
+  text="Isn't this so cool?!"
+  delay={200}
+  animateBy="words"
+  direction="top"
+  onAnimationComplete={handleAnimationComplete}
+  className="text-2xl mb-8"
+/>
+	Code:
+		import { motion } from 'motion/react';
+import { useEffect, useRef, useState, useMemo } from 'react';
+
+const buildKeyframes = (from, steps) => {
+  const keys = new Set([...Object.keys(from), ...steps.flatMap(s => Object.keys(s))]);
+
+  const keyframes = {};
+  keys.forEach(k => {
+    keyframes[k] = [from[k], ...steps.map(s => s[k])];
+  });
+  return keyframes;
+};
+
+const BlurText = ({
+  text = '',
+  delay = 200,
+  className = '',
+  animateBy = 'words',
+  direction = 'top',
+  threshold = 0.1,
+  rootMargin = '0px',
+  animationFrom,
+  animationTo,
+  easing = t => t,
+  onAnimationComplete,
+  stepDuration = 0.35
+}) => {
+  const elements = animateBy === 'words' ? text.split(' ') : text.split('');
+  const [inView, setInView] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    if (!ref.current) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setInView(true);
+          observer.unobserve(ref.current);
+        }
+      },
+      { threshold, rootMargin }
+    );
+    observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, [threshold, rootMargin]);
+
+  const defaultFrom = useMemo(
+    () =>
+      direction === 'top' ? { filter: 'blur(10px)', opacity: 0, y: -50 } : { filter: 'blur(10px)', opacity: 0, y: 50 },
+    [direction]
+  );
+
+  const defaultTo = useMemo(
+    () => [
+      {
+        filter: 'blur(5px)',
+        opacity: 0.5,
+        y: direction === 'top' ? 5 : -5
+      },
+      { filter: 'blur(0px)', opacity: 1, y: 0 }
+    ],
+    [direction]
+  );
+
+  const fromSnapshot = animationFrom ?? defaultFrom;
+  const toSnapshots = animationTo ?? defaultTo;
+
+  const stepCount = toSnapshots.length + 1;
+  const totalDuration = stepDuration * (stepCount - 1);
+  const times = Array.from({ length: stepCount }, (_, i) => (stepCount === 1 ? 0 : i / (stepCount - 1)));
+
+  return (
+    <p ref={ref} className={className} style={{ display: 'flex', flexWrap: 'wrap' }}>
+      {elements.map((segment, index) => {
+        const animateKeyframes = buildKeyframes(fromSnapshot, toSnapshots);
+
+        const spanTransition = {
+          duration: totalDuration,
+          times,
+          delay: (index * delay) / 1000
+        };
+        spanTransition.ease = easing;
+
+        return (
+          <motion.span
+            className="inline-block will-change-[transform,filter,opacity]"
+            key={index}
+            initial={fromSnapshot}
+            animate={inView ? animateKeyframes : fromSnapshot}
+            transition={spanTransition}
+            onAnimationComplete={index === elements.length - 1 ? onAnimationComplete : undefined}
+          >
+            {segment === ' ' ? '\u00A0' : segment}
+            {animateBy === 'words' && index < elements.length - 1 && '\u00A0'}
+          </motion.span>
+        );
+      })}
+    </p>
+  );
+};
+
+export default BlurText;
+
+2.	Text Type
+CLI : npx shadcn@latest add @react-bits/TextType-JS-CSS
+Usage : 
+		import TextType from './TextType';
+
+<TextType 
+  text={["Text typing effect", "for your websites", "Happy coding!"]}
+  typingSpeed={75}
+  pauseDuration={1500}
+  showCursor
+  cursorCharacter="_"
+  texts={["Welcome to React Bits! Good to see you!","Build some amazing experiences!"]}
+  deletingSpeed={50}
+  variableSpeedEnabled={false}
+  variableSpeedMin={60}
+  variableSpeedMax={120}
+  cursorBlinkDuration={0.5}
+/>
+
+Code	:
+	'use client';
+
+import { useEffect, useRef, useState, createElement, useMemo, useCallback } from 'react';
+import { gsap } from 'gsap';
+import './TextType.css';
+
+const TextType = ({
+  text,
+  as: Component = 'div',
+  typingSpeed = 50,
+  initialDelay = 0,
+  pauseDuration = 2000,
+  deletingSpeed = 30,
+  loop = true,
+  className = '',
+  showCursor = true,
+  hideCursorWhileTyping = false,
+  cursorCharacter = '|',
+  cursorClassName = '',
+  cursorBlinkDuration = 0.5,
+  textColors = [],
+  variableSpeed,
+  onSentenceComplete,
+  startOnVisible = false,
+  reverseMode = false,
+  ...props
+}) => {
+  const [displayedText, setDisplayedText] = useState('');
+  const [currentCharIndex, setCurrentCharIndex] = useState(0);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [currentTextIndex, setCurrentTextIndex] = useState(0);
+  const [isVisible, setIsVisible] = useState(!startOnVisible);
+  const cursorRef = useRef(null);
+  const containerRef = useRef(null);
+
+  const textArray = useMemo(() => (Array.isArray(text) ? text : [text]), [text]);
+
+  const getRandomSpeed = useCallback(() => {
+    if (!variableSpeed) return typingSpeed;
+    const { min, max } = variableSpeed;
+    return Math.random() * (max - min) + min;
+  }, [variableSpeed, typingSpeed]);
+
+  const getCurrentTextColor = () => {
+    if (textColors.length === 0) return 'inherit';
+    return textColors[currentTextIndex % textColors.length];
+  };
+
+  useEffect(() => {
+    if (!startOnVisible || !containerRef.current) return;
+
+    const observer = new IntersectionObserver(
+      entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            setIsVisible(true);
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, [startOnVisible]);
+
+  useEffect(() => {
+    if (showCursor && cursorRef.current) {
+      gsap.set(cursorRef.current, { opacity: 1 });
+      gsap.to(cursorRef.current, {
+        opacity: 0,
+        duration: cursorBlinkDuration,
+        repeat: -1,
+        yoyo: true,
+        ease: 'power2.inOut'
+      });
+    }
+  }, [showCursor, cursorBlinkDuration]);
+
+  useEffect(() => {
+    if (!isVisible) return;
+
+    let timeout;
+    const currentText = textArray[currentTextIndex];
+    const processedText = reverseMode ? currentText.split('').reverse().join('') : currentText;
+
+    const executeTypingAnimation = () => {
+      if (isDeleting) {
+        if (displayedText === '') {
+          setIsDeleting(false);
+          if (currentTextIndex === textArray.length - 1 && !loop) {
+            return;
+          }
+
+          if (onSentenceComplete) {
+            onSentenceComplete(textArray[currentTextIndex], currentTextIndex);
+          }
+
+          setCurrentTextIndex(prev => (prev + 1) % textArray.length);
+          setCurrentCharIndex(0);
+          timeout = setTimeout(() => {}, pauseDuration);
+        } else {
+          timeout = setTimeout(() => {
+            setDisplayedText(prev => prev.slice(0, -1));
+          }, deletingSpeed);
+        }
+      } else {
+        if (currentCharIndex < processedText.length) {
+          timeout = setTimeout(
+            () => {
+              setDisplayedText(prev => prev + processedText[currentCharIndex]);
+              setCurrentCharIndex(prev => prev + 1);
+            },
+            variableSpeed ? getRandomSpeed() : typingSpeed
+          );
+        } else if (textArray.length >= 1) {
+          if (!loop && currentTextIndex === textArray.length - 1) return;
+          timeout = setTimeout(() => {
+            setIsDeleting(true);
+          }, pauseDuration);
+        }
+      }
+    };
+
+    if (currentCharIndex === 0 && !isDeleting && displayedText === '') {
+      timeout = setTimeout(executeTypingAnimation, initialDelay);
+    } else {
+      executeTypingAnimation();
+    }
+
+    return () => clearTimeout(timeout);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    currentCharIndex,
+    displayedText,
+    isDeleting,
+    typingSpeed,
+    deletingSpeed,
+    pauseDuration,
+    textArray,
+    currentTextIndex,
+    loop,
+    initialDelay,
+    isVisible,
+    reverseMode,
+    variableSpeed,
+    onSentenceComplete
+  ]);
+
+  const shouldHideCursor =
+    hideCursorWhileTyping && (currentCharIndex < textArray[currentTextIndex].length || isDeleting);
+
+  return createElement(
+    Component,
+    {
+      ref: containerRef,
+      className: `text-type ${className}`,
+      ...props
+    },
+    <span className="text-type__content" style={{ color: getCurrentTextColor() || 'inherit' }}>
+      {displayedText}
+    </span>,
+    showCursor && (
+      <span
+        ref={cursorRef}
+        className={`text-type__cursor ${cursorClassName} ${shouldHideCursor ? 'text-type__cursor--hidden' : ''}`}
+      >
+        {cursorCharacter}
+      </span>
+    )
+  );
+};
+
+export default TextType;
+
+Code	:
+	'use client';
+
+import { useEffect, useRef, useState, createElement, useMemo, useCallback } from 'react';
+import { gsap } from 'gsap';
+import './TextType.css';
+
+const TextType = ({
+  text,
+  as: Component = 'div',
+  typingSpeed = 50,
+  initialDelay = 0,
+  pauseDuration = 2000,
+  deletingSpeed = 30,
+  loop = true,
+  className = '',
+  showCursor = true,
+  hideCursorWhileTyping = false,
+  cursorCharacter = '|',
+  cursorClassName = '',
+  cursorBlinkDuration = 0.5,
+  textColors = [],
+  variableSpeed,
+  onSentenceComplete,
+  startOnVisible = false,
+  reverseMode = false,
+  ...props
+}) => {
+  const [displayedText, setDisplayedText] = useState('');
+  const [currentCharIndex, setCurrentCharIndex] = useState(0);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [currentTextIndex, setCurrentTextIndex] = useState(0);
+  const [isVisible, setIsVisible] = useState(!startOnVisible);
+  const cursorRef = useRef(null);
+  const containerRef = useRef(null);
+
+  const textArray = useMemo(() => (Array.isArray(text) ? text : [text]), [text]);
+
+  const getRandomSpeed = useCallback(() => {
+    if (!variableSpeed) return typingSpeed;
+    const { min, max } = variableSpeed;
+    return Math.random() * (max - min) + min;
+  }, [variableSpeed, typingSpeed]);
+
+  const getCurrentTextColor = () => {
+    if (textColors.length === 0) return 'inherit';
+    return textColors[currentTextIndex % textColors.length];
+  };
+
+  useEffect(() => {
+    if (!startOnVisible || !containerRef.current) return;
+
+    const observer = new IntersectionObserver(
+      entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            setIsVisible(true);
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, [startOnVisible]);
+
+  useEffect(() => {
+    if (showCursor && cursorRef.current) {
+      gsap.set(cursorRef.current, { opacity: 1 });
+      gsap.to(cursorRef.current, {
+        opacity: 0,
+        duration: cursorBlinkDuration,
+        repeat: -1,
+        yoyo: true,
+        ease: 'power2.inOut'
+      });
+    }
+  }, [showCursor, cursorBlinkDuration]);
+
+  useEffect(() => {
+    if (!isVisible) return;
+
+    let timeout;
+    const currentText = textArray[currentTextIndex];
+    const processedText = reverseMode ? currentText.split('').reverse().join('') : currentText;
+
+    const executeTypingAnimation = () => {
+      if (isDeleting) {
+        if (displayedText === '') {
+          setIsDeleting(false);
+          if (currentTextIndex === textArray.length - 1 && !loop) {
+            return;
+          }
+
+          if (onSentenceComplete) {
+            onSentenceComplete(textArray[currentTextIndex], currentTextIndex);
+          }
+
+          setCurrentTextIndex(prev => (prev + 1) % textArray.length);
+          setCurrentCharIndex(0);
+          timeout = setTimeout(() => {}, pauseDuration);
+        } else {
+          timeout = setTimeout(() => {
+            setDisplayedText(prev => prev.slice(0, -1));
+          }, deletingSpeed);
+        }
+      } else {
+        if (currentCharIndex < processedText.length) {
+          timeout = setTimeout(
+            () => {
+              setDisplayedText(prev => prev + processedText[currentCharIndex]);
+              setCurrentCharIndex(prev => prev + 1);
+            },
+            variableSpeed ? getRandomSpeed() : typingSpeed
+          );
+        } else if (textArray.length >= 1) {
+          if (!loop && currentTextIndex === textArray.length - 1) return;
+          timeout = setTimeout(() => {
+            setIsDeleting(true);
+          }, pauseDuration);
+        }
+      }
+    };
+
+    if (currentCharIndex === 0 && !isDeleting && displayedText === '') {
+      timeout = setTimeout(executeTypingAnimation, initialDelay);
+    } else {
+      executeTypingAnimation();
+    }
+
+    return () => clearTimeout(timeout);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    currentCharIndex,
+    displayedText,
+    isDeleting,
+    typingSpeed,
+    deletingSpeed,
+    pauseDuration,
+    textArray,
+    currentTextIndex,
+    loop,
+    initialDelay,
+    isVisible,
+    reverseMode,
+    variableSpeed,
+    onSentenceComplete
+  ]);
+
+  const shouldHideCursor =
+    hideCursorWhileTyping && (currentCharIndex < textArray[currentTextIndex].length || isDeleting);
+
+  return createElement(
+    Component,
+    {
+      ref: containerRef,
+      className: `text-type ${className}`,
+      ...props
+    },
+    <span className="text-type__content" style={{ color: getCurrentTextColor() || 'inherit' }}>
+      {displayedText}
+    </span>,
+    showCursor && (
+      <span
+        ref={cursorRef}
+        className={`text-type__cursor ${cursorClassName} ${shouldHideCursor ? 'text-type__cursor--hidden' : ''}`}
+      >
+        {cursorCharacter}
+      </span>
+    )
+  );
+};
+
+export default TextType;
+
+CSS :
+	.text-type {
+  display: inline-block;
+  white-space: pre-wrap;
+}
+
+.text-type__cursor {
+  margin-left: 0.25rem;
+  display: inline-block;
+  opacity: 1;
+}
+
+.text-type__cursor--hidden {
+  display: none;
+}
+
+3.	Shiny Text
+CLI :  npx shadcn@latest add @react-bits/ShinyText-JS-CSS
+Usage : 
+	import ShinyText from './ShinyText';
+
+<ShinyText
+  text="✨ Shiny Text Effect"
+  speed={2}
+  delay={0}
+  color="#b5b5b5"
+  shineColor="#ffffff"
+  spread={120}
+  direction="left"
+  yoyo={false}
+  pauseOnHover={false}
+  disabled={false}
+/>
+
+Code : 
+import { useState, useCallback, useEffect, useRef } from 'react';
+import { motion, useMotionValue, useAnimationFrame, useTransform } from 'motion/react';
+import './ShinyText.css';
+
+const ShinyText = ({
+  text,
+  disabled = false,
+  speed = 2,
+  className = '',
+  color = '#b5b5b5',
+  shineColor = '#ffffff',
+  spread = 120,
+  yoyo = false,
+  pauseOnHover = false,
+  direction = 'left',
+  delay = 0
+}) => {
+  const [isPaused, setIsPaused] = useState(false);
+  const progress = useMotionValue(0);
+  const elapsedRef = useRef(0);
+  const lastTimeRef = useRef(null);
+  const directionRef = useRef(direction === 'left' ? 1 : -1);
+
+  const animationDuration = speed * 1000;
+  const delayDuration = delay * 1000;
+
+  useAnimationFrame(time => {
+    if (disabled || isPaused) {
+      lastTimeRef.current = null;
+      return;
+    }
+
+    if (lastTimeRef.current === null) {
+      lastTimeRef.current = time;
+      return;
+    }
+
+    const deltaTime = time - lastTimeRef.current;
+    lastTimeRef.current = time;
+
+    elapsedRef.current += deltaTime;
+
+    if (yoyo) {
+      const cycleDuration = animationDuration + delayDuration;
+      const fullCycle = cycleDuration * 2;
+      const cycleTime = elapsedRef.current % fullCycle;
+
+      if (cycleTime < animationDuration) {
+        // Forward animation: 0 -> 100
+        const p = (cycleTime / animationDuration) * 100;
+        progress.set(directionRef.current === 1 ? p : 100 - p);
+      } else if (cycleTime < cycleDuration) {
+        // Delay at end
+        progress.set(directionRef.current === 1 ? 100 : 0);
+      } else if (cycleTime < cycleDuration + animationDuration) {
+        // Reverse animation: 100 -> 0
+        const reverseTime = cycleTime - cycleDuration;
+        const p = 100 - (reverseTime / animationDuration) * 100;
+        progress.set(directionRef.current === 1 ? p : 100 - p);
+      } else {
+        // Delay at start
+        progress.set(directionRef.current === 1 ? 0 : 100);
+      }
+    } else {
+      const cycleDuration = animationDuration + delayDuration;
+      const cycleTime = elapsedRef.current % cycleDuration;
+
+      if (cycleTime < animationDuration) {
+        // Animation phase: 0 -> 100
+        const p = (cycleTime / animationDuration) * 100;
+        progress.set(directionRef.current === 1 ? p : 100 - p);
+      } else {
+        // Delay phase - hold at end (shine off-screen)
+        progress.set(directionRef.current === 1 ? 100 : 0);
+      }
+    }
+  });
+
+  useEffect(() => {
+    directionRef.current = direction === 'left' ? 1 : -1;
+    elapsedRef.current = 0;
+    progress.set(0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [direction]);
+
+  // Transform: p=0 -> 150% (shine off right), p=100 -> -50% (shine off left)
+  const backgroundPosition = useTransform(progress, p => `${150 - p * 2}% center`);
+
+  const handleMouseEnter = useCallback(() => {
+    if (pauseOnHover) setIsPaused(true);
+  }, [pauseOnHover]);
+
+  const handleMouseLeave = useCallback(() => {
+    if (pauseOnHover) setIsPaused(false);
+  }, [pauseOnHover]);
+
+  const gradientStyle = {
+    backgroundImage: `linear-gradient(${spread}deg, ${color} 0%, ${color} 35%, ${shineColor} 50%, ${color} 65%, ${color} 100%)`,
+    backgroundSize: '200% auto',
+    WebkitBackgroundClip: 'text',
+    backgroundClip: 'text',
+    WebkitTextFillColor: 'transparent'
+  };
+
+  return (
+    <motion.span
+      className={`shiny-text ${className}`}
+      style={{ ...gradientStyle, backgroundPosition }}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      {text}
+    </motion.span>
+  );
+};
+
+export default ShinyText;
+
+CSS :
+.shiny-text {
+  display: inline-block;
+}	
+
+4.	Rotating Text
+CLI : npx shadcn@latest add @react-bits/RotatingText-JS-CSS
+Usage : 
+	import RotatingText from './RotatingText'
+  
+<RotatingText
+  texts={['React', 'Bits', 'Is', 'Cool!']}
+  mainClassName="px-2 sm:px-2 md:px-3 bg-cyan-300 text-black overflow-hidden py-0.5 sm:py-1 md:py-2 justify-center rounded-lg"
+  staggerFrom="last"
+  initial={{ y: "100%" }}
+  animate={{ y: 0 }}
+  exit={{ y: "-120%" }}
+  staggerDuration={0.025}
+  splitLevelClassName="overflow-hidden pb-0.5 sm:pb-1 md:pb-1"
+  transition={{ type: "spring", damping: 30, stiffness: 400 }}
+  rotationInterval={2000}
+  splitBy="characters"
+  auto
+  loop
+/>
+
+Code :
+	'use client';
+
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useState } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
+
+import './RotatingText.css';
+
+function cn(...classes) {
+  return classes.filter(Boolean).join(' ');
+}
+
+const RotatingText = forwardRef((props, ref) => {
+  const {
+    texts,
+    transition = { type: 'spring', damping: 25, stiffness: 300 },
+    initial = { y: '100%', opacity: 0 },
+    animate = { y: 0, opacity: 1 },
+    exit = { y: '-120%', opacity: 0 },
+    animatePresenceMode = 'wait',
+    animatePresenceInitial = false,
+    rotationInterval = 2000,
+    staggerDuration = 0,
+    staggerFrom = 'first',
+    loop = true,
+    auto = true,
+    splitBy = 'characters',
+    onNext,
+    mainClassName,
+    splitLevelClassName,
+    elementLevelClassName,
+    ...rest
+  } = props;
+
+  const [currentTextIndex, setCurrentTextIndex] = useState(0);
+
+  const splitIntoCharacters = text => {
+    if (typeof Intl !== 'undefined' && Intl.Segmenter) {
+      const segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' });
+      return Array.from(segmenter.segment(text), segment => segment.segment);
+    }
+    return Array.from(text);
+  };
+
+  const elements = useMemo(() => {
+    const currentText = texts[currentTextIndex];
+    if (splitBy === 'characters') {
+      const words = currentText.split(' ');
+      return words.map((word, i) => ({
+        characters: splitIntoCharacters(word),
+        needsSpace: i !== words.length - 1
+      }));
+    }
+    if (splitBy === 'words') {
+      return currentText.split(' ').map((word, i, arr) => ({
+        characters: [word],
+        needsSpace: i !== arr.length - 1
+      }));
+    }
+    if (splitBy === 'lines') {
+      return currentText.split('\n').map((line, i, arr) => ({
+        characters: [line],
+        needsSpace: i !== arr.length - 1
+      }));
+    }
+
+    return currentText.split(splitBy).map((part, i, arr) => ({
+      characters: [part],
+      needsSpace: i !== arr.length - 1
+    }));
+  }, [texts, currentTextIndex, splitBy]);
+
+  const getStaggerDelay = useCallback(
+    (index, totalChars) => {
+      const total = totalChars;
+      if (staggerFrom === 'first') return index * staggerDuration;
+      if (staggerFrom === 'last') return (total - 1 - index) * staggerDuration;
+      if (staggerFrom === 'center') {
+        const center = Math.floor(total / 2);
+        return Math.abs(center - index) * staggerDuration;
+      }
+      if (staggerFrom === 'random') {
+        const randomIndex = Math.floor(Math.random() * total);
+        return Math.abs(randomIndex - index) * staggerDuration;
+      }
+      return Math.abs(staggerFrom - index) * staggerDuration;
+    },
+    [staggerFrom, staggerDuration]
+  );
+
+  const handleIndexChange = useCallback(
+    newIndex => {
+      setCurrentTextIndex(newIndex);
+      if (onNext) onNext(newIndex);
+    },
+    [onNext]
+  );
+
+  const next = useCallback(() => {
+    const nextIndex = currentTextIndex === texts.length - 1 ? (loop ? 0 : currentTextIndex) : currentTextIndex + 1;
+    if (nextIndex !== currentTextIndex) {
+      handleIndexChange(nextIndex);
+    }
+  }, [currentTextIndex, texts.length, loop, handleIndexChange]);
+
+  const previous = useCallback(() => {
+    const prevIndex = currentTextIndex === 0 ? (loop ? texts.length - 1 : currentTextIndex) : currentTextIndex - 1;
+    if (prevIndex !== currentTextIndex) {
+      handleIndexChange(prevIndex);
+    }
+  }, [currentTextIndex, texts.length, loop, handleIndexChange]);
+
+  const jumpTo = useCallback(
+    index => {
+      const validIndex = Math.max(0, Math.min(index, texts.length - 1));
+      if (validIndex !== currentTextIndex) {
+        handleIndexChange(validIndex);
+      }
+    },
+    [texts.length, currentTextIndex, handleIndexChange]
+  );
+
+  const reset = useCallback(() => {
+    if (currentTextIndex !== 0) {
+      handleIndexChange(0);
+    }
+  }, [currentTextIndex, handleIndexChange]);
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      next,
+      previous,
+      jumpTo,
+      reset
+    }),
+    [next, previous, jumpTo, reset]
+  );
+
+  useEffect(() => {
+    if (!auto) return;
+    const intervalId = setInterval(next, rotationInterval);
+    return () => clearInterval(intervalId);
+  }, [next, rotationInterval, auto]);
+
+  return (
+    <motion.span className={cn('text-rotate', mainClassName)} {...rest} layout transition={transition}>
+      <span className="text-rotate-sr-only">{texts[currentTextIndex]}</span>
+      <AnimatePresence mode={animatePresenceMode} initial={animatePresenceInitial}>
+        <motion.span
+          key={currentTextIndex}
+          className={cn(splitBy === 'lines' ? 'text-rotate-lines' : 'text-rotate')}
+          layout
+          aria-hidden="true"
+        >
+          {elements.map((wordObj, wordIndex, array) => {
+            const previousCharsCount = array.slice(0, wordIndex).reduce((sum, word) => sum + word.characters.length, 0);
+            return (
+              <span key={wordIndex} className={cn('text-rotate-word', splitLevelClassName)}>
+                {wordObj.characters.map((char, charIndex) => (
+                  <motion.span
+                    key={charIndex}
+                    initial={initial}
+                    animate={animate}
+                    exit={exit}
+                    transition={{
+                      ...transition,
+                      delay: getStaggerDelay(
+                        previousCharsCount + charIndex,
+                        array.reduce((sum, word) => sum + word.characters.length, 0)
+                      )
+                    }}
+                    className={cn('text-rotate-element', elementLevelClassName)}
+                  >
+                    {char}
+                  </motion.span>
+                ))}
+                {wordObj.needsSpace && <span className="text-rotate-space"> </span>}
+              </span>
+            );
+          })}
+        </motion.span>
+      </AnimatePresence>
+    </motion.span>
+  );
+});
+
+RotatingText.displayName = 'RotatingText';
+export default RotatingText;
+
+CSS :
+	.text-rotate {
+  display: flex;
+  flex-wrap: wrap;
+  white-space: pre-wrap;
+  position: relative;
+}
+
+.text-rotate-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.text-rotate-word {
+  display: inline-flex;
+}
+
+.text-rotate-lines {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.text-rotate-element {
+  display: inline-block;
+}
+
+.text-rotate-space {
+  white-space: pre;
+}
+
+5.	Scroll Reveal
+CLI : npx shadcn@latest add @react-bits/ScrollReveal-JS-CSS
+Usage : 
+	import ScrollReveal from './ScrollReveal';
+
+<ScrollReveal
+  baseOpacity={0.1}
+  enableBlur
+  baseRotation={3}
+  blurStrength={4}
+>
+  When does a man die? When he is hit by a bullet? No! When he suffers a disease?
+  No! When he ate a soup made out of a poisonous mushroom?
+  No! A man dies when he is forgotten!
+</ScrollReveal>
+
+Code:
+	import { useEffect, useRef, useMemo } from 'react';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+import './ScrollReveal.css';
+
+gsap.registerPlugin(ScrollTrigger);
+
+const ScrollReveal = ({
+  children,
+  scrollContainerRef,
+  enableBlur = true,
+  baseOpacity = 0.1,
+  baseRotation = 3,
+  blurStrength = 4,
+  containerClassName = '',
+  textClassName = '',
+  rotationEnd = 'bottom bottom',
+  wordAnimationEnd = 'bottom bottom'
+}) => {
+  const containerRef = useRef(null);
+
+  const splitText = useMemo(() => {
+    const text = typeof children === 'string' ? children : '';
+    return text.split(/(\s+)/).map((word, index) => {
+      if (word.match(/^\s+$/)) return word;
+      return (
+        <span className="word" key={index}>
+          {word}
+        </span>
+      );
+    });
+  }, [children]);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    const scroller = scrollContainerRef && scrollContainerRef.current ? scrollContainerRef.current : window;
+
+    gsap.fromTo(
+      el,
+      { transformOrigin: '0% 50%', rotate: baseRotation },
+      {
+        ease: 'none',
+        rotate: 0,
+        scrollTrigger: {
+          trigger: el,
+          scroller,
+          start: 'top bottom',
+          end: rotationEnd,
+          scrub: true
+        }
+      }
+    );
+
+    const wordElements = el.querySelectorAll('.word');
+
+    gsap.fromTo(
+      wordElements,
+      { opacity: baseOpacity, willChange: 'opacity' },
+      {
+        ease: 'none',
+        opacity: 1,
+        stagger: 0.05,
+        scrollTrigger: {
+          trigger: el,
+          scroller,
+          start: 'top bottom-=20%',
+          end: wordAnimationEnd,
+          scrub: true
+        }
+      }
+    );
+
+    if (enableBlur) {
+      gsap.fromTo(
+        wordElements,
+        { filter: `blur(${blurStrength}px)` },
+        {
+          ease: 'none',
+          filter: 'blur(0px)',
+          stagger: 0.05,
+          scrollTrigger: {
+            trigger: el,
+            scroller,
+            start: 'top bottom-=20%',
+            end: wordAnimationEnd,
+            scrub: true
+          }
+        }
+      );
+    }
+
+    return () => {
+      ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+    };
+  }, [scrollContainerRef, enableBlur, baseRotation, baseOpacity, rotationEnd, wordAnimationEnd, blurStrength]);
+
+  return (
+    <h2 ref={containerRef} className={`scroll-reveal ${containerClassName}`}>
+      <p className={`scroll-reveal-text ${textClassName}`}>{splitText}</p>
+    </h2>
+  );
+};
+
+export default ScrollReveal;
+
+CSS :
+.scroll-reveal {
+  margin: 20px 0;
+}
+
+.scroll-reveal-text {
+  font-size: clamp(1.6rem, 4vw, 3rem);
+  line-height: 1.5;
+  font-weight: 600;
+}
+
+.word {
+  display: inline-block;
+}
+
+6.	Scroll Velocity
+CLI = npx shadcn@latest add @react-bits/ScrollVelocity-JS-CSS
+Usage = 
+import ScrollVelocity from './ScrollVelocity';
+  
+<ScrollVelocity
+  texts={['React Bits', 'Scroll Down']} 
+  velocity={100}
+  className="custom-scroll-text"
+  numCopies={6}
+  damping={50}
+  stiffness={400}
+/>
+	Code = 
+		import { useRef, useLayoutEffect, useState } from 'react';
+import {
+  motion,
+  useScroll,
+  useSpring,
+  useTransform,
+  useMotionValue,
+  useVelocity,
+  useAnimationFrame
+} from 'motion/react';
+import './ScrollVelocity.css';
+
+function useElementWidth(ref) {
+  const [width, setWidth] = useState(0);
+
+  useLayoutEffect(() => {
+    function updateWidth() {
+      if (ref.current) {
+        setWidth(ref.current.offsetWidth);
+      }
+    }
+    updateWidth();
+    window.addEventListener('resize', updateWidth);
+    return () => window.removeEventListener('resize', updateWidth);
+  }, [ref]);
+
+  return width;
+}
+
+export const ScrollVelocity = ({
+  scrollContainerRef,
+  texts = [],
+  velocity = 100,
+  className = '',
+  damping = 50,
+  stiffness = 400,
+  numCopies = 6,
+  velocityMapping = { input: [0, 1000], output: [0, 5] },
+  parallaxClassName = 'parallax',
+  scrollerClassName = 'scroller',
+  parallaxStyle,
+  scrollerStyle
+}) => {
+  function VelocityText({
+    children,
+    baseVelocity = velocity,
+    scrollContainerRef,
+    className = '',
+    damping,
+    stiffness,
+    numCopies,
+    velocityMapping,
+    parallaxClassName,
+    scrollerClassName,
+    parallaxStyle,
+    scrollerStyle
+  }) {
+    const baseX = useMotionValue(0);
+    const scrollOptions = scrollContainerRef ? { container: scrollContainerRef } : {};
+    const { scrollY } = useScroll(scrollOptions);
+    const scrollVelocity = useVelocity(scrollY);
+    const smoothVelocity = useSpring(scrollVelocity, {
+      damping: damping ?? 50,
+      stiffness: stiffness ?? 400
+    });
+    const velocityFactor = useTransform(
+      smoothVelocity,
+      velocityMapping?.input || [0, 1000],
+      velocityMapping?.output || [0, 5],
+      { clamp: false }
+    );
+
+    const copyRef = useRef(null);
+    const copyWidth = useElementWidth(copyRef);
+
+    function wrap(min, max, v) {
+      const range = max - min;
+      const mod = (((v - min) % range) + range) % range;
+      return mod + min;
+    }
+
+    const x = useTransform(baseX, v => {
+      if (copyWidth === 0) return '0px';
+      return `${wrap(-copyWidth, 0, v)}px`;
+    });
+
+    const directionFactor = useRef(1);
+    useAnimationFrame((t, delta) => {
+      let moveBy = directionFactor.current * baseVelocity * (delta / 1000);
+
+      if (velocityFactor.get() < 0) {
+        directionFactor.current = -1;
+      } else if (velocityFactor.get() > 0) {
+        directionFactor.current = 1;
+      }
+
+      moveBy += directionFactor.current * moveBy * velocityFactor.get();
+      baseX.set(baseX.get() + moveBy);
+    });
+
+    const spans = [];
+    for (let i = 0; i < numCopies; i++) {
+      spans.push(
+        <span className={className} key={i} ref={i === 0 ? copyRef : null}>
+          {children}&nbsp;
+        </span>
+      );
+    }
+
+    return (
+      <div className={parallaxClassName} style={parallaxStyle}>
+        <motion.div className={scrollerClassName} style={{ x, ...scrollerStyle }}>
+          {spans}
+        </motion.div>
+      </div>
+    );
+  }
+
+  return (
+    <section>
+      {texts.map((text, index) => (
+        <VelocityText
+          key={index}
+          className={className}
+          baseVelocity={index % 2 !== 0 ? -velocity : velocity}
+          scrollContainerRef={scrollContainerRef}
+          damping={damping}
+          stiffness={stiffness}
+          numCopies={numCopies}
+          velocityMapping={velocityMapping}
+          parallaxClassName={parallaxClassName}
+          scrollerClassName={scrollerClassName}
+          parallaxStyle={parallaxStyle}
+          scrollerStyle={scrollerStyle}
+        >
+          {text}
+        </VelocityText>
+      ))}
+    </section>
+  );
+};
+
+export default ScrollVelocity;
+
+CSS = 
+.parallax {
+  position: relative;
+  overflow: hidden;
+}
+
+.scroller {
+  display: flex;
+  white-space: nowrap;
+  text-align: center;
+  font-family: sans-serif;
+  font-size: 2.25rem;
+  font-weight: bold;
+  letter-spacing: -0.02em;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.1));
+}
+
+.scroller span {
+  flex-shrink: 0;
+}
+
+@media (min-width: 768px) {
+  .scroller {
+    font-size: 5rem;
+    line-height: 5rem;
+  }
+}	
+
+B.	Animations Documentations
+CLI = npx shadcn@latest add @react-bits/SplashCursor-JS-CSS
+Usage =
+	import SplashCursor from './SplashCursor'
+
+<SplashCursor
+  DENSITY_DISSIPATION={3.5}
+  VELOCITY_DISSIPATION={2}
+  PRESSURE={0.1}
+  CURL={3}
+  SPLAT_RADIUS={0.2}
+  SPLAT_FORCE={6000}
+  COLOR_UPDATE_SPEED={10}
+  SHADING
+  RAINBOW_MODE={false}
+  COLOR="#A855F7"
+/>
+
+Code :
+'use client';
+import { useEffect, useRef } from 'react';
+
+function SplashCursor({
+  SIM_RESOLUTION = 128,
+  DYE_RESOLUTION = 1440,
+  CAPTURE_RESOLUTION = 512,
+  DENSITY_DISSIPATION = 3.5,
+  VELOCITY_DISSIPATION = 2,
+  PRESSURE = 0.1,
+  PRESSURE_ITERATIONS = 20,
+  CURL = 3,
+  SPLAT_RADIUS = 0.2,
+  SPLAT_FORCE = 6000,
+  SHADING = true,
+  COLOR_UPDATE_SPEED = 10,
+  BACK_COLOR = { r: 0.5, g: 0, b: 0 },
+  TRANSPARENT = true,
+  RAINBOW_MODE = true,
+  COLOR = '#ff0000'
+}) {
+  const canvasRef = useRef(null);
+  const animationFrameId = useRef(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    // Track if the effect is still active for cleanup
+    let isActive = true;
+
+    function pointerPrototype() {
+      this.id = -1;
+      this.texcoordX = 0;
+      this.texcoordY = 0;
+      this.prevTexcoordX = 0;
+      this.prevTexcoordY = 0;
+      this.deltaX = 0;
+      this.deltaY = 0;
+      this.down = false;
+      this.moved = false;
+      this.color = [0, 0, 0];
+    }
+
+    let config = {
+      SIM_RESOLUTION,
+      DYE_RESOLUTION,
+      CAPTURE_RESOLUTION,
+      DENSITY_DISSIPATION,
+      VELOCITY_DISSIPATION,
+      PRESSURE,
+      PRESSURE_ITERATIONS,
+      CURL,
+      SPLAT_RADIUS,
+      SPLAT_FORCE,
+      SHADING,
+      COLOR_UPDATE_SPEED,
+      PAUSED: false,
+      BACK_COLOR,
+      TRANSPARENT,
+      RAINBOW_MODE,
+      COLOR
+    };
+
+    let pointers = [new pointerPrototype()];
+
+    const { gl, ext } = getWebGLContext(canvas);
+    if (!ext.supportLinearFiltering) {
+      config.DYE_RESOLUTION = 256;
+      config.SHADING = false;
+    }
+
+    function getWebGLContext(canvas) {
+      const params = {
+        alpha: true,
+        depth: false,
+        stencil: false,
+        antialias: false,
+        preserveDrawingBuffer: false
+      };
+      let gl = canvas.getContext('webgl2', params);
+      const isWebGL2 = !!gl;
+      if (!isWebGL2) gl = canvas.getContext('webgl', params) || canvas.getContext('experimental-webgl', params);
+
+      let halfFloat;
+      let supportLinearFiltering;
+      if (isWebGL2) {
+        gl.getExtension('EXT_color_buffer_float');
+        supportLinearFiltering = gl.getExtension('OES_texture_float_linear');
+      } else {
+        halfFloat = gl.getExtension('OES_texture_half_float');
+        supportLinearFiltering = gl.getExtension('OES_texture_half_float_linear');
+      }
+      gl.clearColor(0.0, 0.0, 0.0, 1.0);
+
+      const halfFloatTexType = isWebGL2 ? gl.HALF_FLOAT : halfFloat && halfFloat.HALF_FLOAT_OES;
+      let formatRGBA;
+      let formatRG;
+      let formatR;
+
+      if (isWebGL2) {
+        formatRGBA = getSupportedFormat(gl, gl.RGBA16F, gl.RGBA, halfFloatTexType);
+        formatRG = getSupportedFormat(gl, gl.RG16F, gl.RG, halfFloatTexType);
+        formatR = getSupportedFormat(gl, gl.R16F, gl.RED, halfFloatTexType);
+      } else {
+        formatRGBA = getSupportedFormat(gl, gl.RGBA, gl.RGBA, halfFloatTexType);
+        formatRG = getSupportedFormat(gl, gl.RGBA, gl.RGBA, halfFloatTexType);
+        formatR = getSupportedFormat(gl, gl.RGBA, gl.RGBA, halfFloatTexType);
+      }
+
+      return {
+        gl,
+        ext: {
+          formatRGBA,
+          formatRG,
+          formatR,
+          halfFloatTexType,
+          supportLinearFiltering
+        }
+      };
+    }
+
+    function getSupportedFormat(gl, internalFormat, format, type) {
+      if (!supportRenderTextureFormat(gl, internalFormat, format, type)) {
+        switch (internalFormat) {
+          case gl.R16F:
+            return getSupportedFormat(gl, gl.RG16F, gl.RG, type);
+          case gl.RG16F:
+            return getSupportedFormat(gl, gl.RGBA16F, gl.RGBA, type);
+          default:
+            return null;
+        }
+      }
+      return { internalFormat, format };
+    }
+
+    function supportRenderTextureFormat(gl, internalFormat, format, type) {
+      const texture = gl.createTexture();
+      gl.bindTexture(gl.TEXTURE_2D, texture);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      gl.texImage2D(gl.TEXTURE_2D, 0, internalFormat, 4, 4, 0, format, type, null);
+      const fbo = gl.createFramebuffer();
+      gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
+      gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
+      const status = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
+      return status === gl.FRAMEBUFFER_COMPLETE;
+    }
+
+    class Material {
+      constructor(vertexShader, fragmentShaderSource) {
+        this.vertexShader = vertexShader;
+        this.fragmentShaderSource = fragmentShaderSource;
+        this.programs = [];
+        this.activeProgram = null;
+        this.uniforms = [];
+      }
+      setKeywords(keywords) {
+        let hash = 0;
+        for (let i = 0; i < keywords.length; i++) hash += hashCode(keywords[i]);
+        let program = this.programs[hash];
+        if (program == null) {
+          let fragmentShader = compileShader(gl.FRAGMENT_SHADER, this.fragmentShaderSource, keywords);
+          program = createProgram(this.vertexShader, fragmentShader);
+          this.programs[hash] = program;
+        }
+        if (program === this.activeProgram) return;
+        this.uniforms = getUniforms(program);
+        this.activeProgram = program;
+      }
+      bind() {
+        gl.useProgram(this.activeProgram);
+      }
+    }
+
+    class Program {
+      constructor(vertexShader, fragmentShader) {
+        this.uniforms = {};
+        this.program = createProgram(vertexShader, fragmentShader);
+        this.uniforms = getUniforms(this.program);
+      }
+      bind() {
+        gl.useProgram(this.program);
+      }
+    }
+
+    function createProgram(vertexShader, fragmentShader) {
+      let program = gl.createProgram();
+      gl.attachShader(program, vertexShader);
+      gl.attachShader(program, fragmentShader);
+      gl.linkProgram(program);
+      if (!gl.getProgramParameter(program, gl.LINK_STATUS)) console.trace(gl.getProgramInfoLog(program));
+      return program;
+    }
+
+    function getUniforms(program) {
+      let uniforms = [];
+      let uniformCount = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
+      for (let i = 0; i < uniformCount; i++) {
+        let uniformName = gl.getActiveUniform(program, i).name;
+        uniforms[uniformName] = gl.getUniformLocation(program, uniformName);
+      }
+      return uniforms;
+    }
+
+    function compileShader(type, source, keywords) {
+      source = addKeywords(source, keywords);
+      const shader = gl.createShader(type);
+      gl.shaderSource(shader, source);
+      gl.compileShader(shader);
+      if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) console.trace(gl.getShaderInfoLog(shader));
+      return shader;
+    }
+
+    function addKeywords(source, keywords) {
+      if (!keywords) return source;
+      let keywordsString = '';
+      keywords.forEach(keyword => {
+        keywordsString += '#define ' + keyword + '\n';
+      });
+      return keywordsString + source;
+    }
+
+    const baseVertexShader = compileShader(
+      gl.VERTEX_SHADER,
+      `
+        precision highp float;
+        attribute vec2 aPosition;
+        varying vec2 vUv;
+        varying vec2 vL;
+        varying vec2 vR;
+        varying vec2 vT;
+        varying vec2 vB;
+        uniform vec2 texelSize;
+
+        void main () {
+            vUv = aPosition * 0.5 + 0.5;
+            vL = vUv - vec2(texelSize.x, 0.0);
+            vR = vUv + vec2(texelSize.x, 0.0);
+            vT = vUv + vec2(0.0, texelSize.y);
+            vB = vUv - vec2(0.0, texelSize.y);
+            gl_Position = vec4(aPosition, 0.0, 1.0);
+        }
+      `
+    );
+
+    const copyShader = compileShader(
+      gl.FRAGMENT_SHADER,
+      `
+        precision mediump float;
+        precision mediump sampler2D;
+        varying highp vec2 vUv;
+        uniform sampler2D uTexture;
+
+        void main () {
+            gl_FragColor = texture2D(uTexture, vUv);
+        }
+      `
+    );
+
+    const clearShader = compileShader(
+      gl.FRAGMENT_SHADER,
+      `
+        precision mediump float;
+        precision mediump sampler2D;
+        varying highp vec2 vUv;
+        uniform sampler2D uTexture;
+        uniform float value;
+
+        void main () {
+            gl_FragColor = value * texture2D(uTexture, vUv);
+        }
+      `
+    );
+
+    const displayShaderSource = `
+      precision highp float;
+      precision highp sampler2D;
+      varying vec2 vUv;
+      varying vec2 vL;
+      varying vec2 vR;
+      varying vec2 vT;
+      varying vec2 vB;
+      uniform sampler2D uTexture;
+      uniform sampler2D uDithering;
+      uniform vec2 ditherScale;
+      uniform vec2 texelSize;
+
+      vec3 linearToGamma (vec3 color) {
+          color = max(color, vec3(0));
+          return max(1.055 * pow(color, vec3(0.416666667)) - 0.055, vec3(0));
+      }
+
+      void main () {
+          vec3 c = texture2D(uTexture, vUv).rgb;
+          #ifdef SHADING
+              vec3 lc = texture2D(uTexture, vL).rgb;
+              vec3 rc = texture2D(uTexture, vR).rgb;
+              vec3 tc = texture2D(uTexture, vT).rgb;
+              vec3 bc = texture2D(uTexture, vB).rgb;
+
+              float dx = length(rc) - length(lc);
+              float dy = length(tc) - length(bc);
+
+              vec3 n = normalize(vec3(dx, dy, length(texelSize)));
+              vec3 l = vec3(0.0, 0.0, 1.0);
+
+              float diffuse = clamp(dot(n, l) + 0.7, 0.7, 1.0);
+              c *= diffuse;
+          #endif
+
+          float a = max(c.r, max(c.g, c.b));
+          gl_FragColor = vec4(c, a);
+      }
+    `;
+
+    const splatShader = compileShader(
+      gl.FRAGMENT_SHADER,
+      `
+        precision highp float;
+        precision highp sampler2D;
+        varying vec2 vUv;
+        uniform sampler2D uTarget;
+        uniform float aspectRatio;
+        uniform vec3 color;
+        uniform vec2 point;
+        uniform float radius;
+
+        void main () {
+            vec2 p = vUv - point.xy;
+            p.x *= aspectRatio;
+            vec3 splat = exp(-dot(p, p) / radius) * color;
+            vec3 base = texture2D(uTarget, vUv).xyz;
+            gl_FragColor = vec4(base + splat, 1.0);
+        }
+      `
+    );
+
+    const advectionShader = compileShader(
+      gl.FRAGMENT_SHADER,
+      `
+        precision highp float;
+        precision highp sampler2D;
+        varying vec2 vUv;
+        uniform sampler2D uVelocity;
+        uniform sampler2D uSource;
+        uniform vec2 texelSize;
+        uniform vec2 dyeTexelSize;
+        uniform float dt;
+        uniform float dissipation;
+
+        vec4 bilerp (sampler2D sam, vec2 uv, vec2 tsize) {
+            vec2 st = uv / tsize - 0.5;
+            vec2 iuv = floor(st);
+            vec2 fuv = fract(st);
+
+            vec4 a = texture2D(sam, (iuv + vec2(0.5, 0.5)) * tsize);
+            vec4 b = texture2D(sam, (iuv + vec2(1.5, 0.5)) * tsize);
+            vec4 c = texture2D(sam, (iuv + vec2(0.5, 1.5)) * tsize);
+            vec4 d = texture2D(sam, (iuv + vec2(1.5, 1.5)) * tsize);
+
+            return mix(mix(a, b, fuv.x), mix(c, d, fuv.x), fuv.y);
+        }
+
+        void main () {
+            #ifdef MANUAL_FILTERING
+                vec2 coord = vUv - dt * bilerp(uVelocity, vUv, texelSize).xy * texelSize;
+                vec4 result = bilerp(uSource, coord, dyeTexelSize);
+            #else
+                vec2 coord = vUv - dt * texture2D(uVelocity, vUv).xy * texelSize;
+                vec4 result = texture2D(uSource, coord);
+            #endif
+            float decay = 1.0 + dissipation * dt;
+            gl_FragColor = result / decay;
+        }
+      `,
+      ext.supportLinearFiltering ? null : ['MANUAL_FILTERING']
+    );
+
+    const divergenceShader = compileShader(
+      gl.FRAGMENT_SHADER,
+      `
+        precision mediump float;
+        precision mediump sampler2D;
+        varying highp vec2 vUv;
+        varying highp vec2 vL;
+        varying highp vec2 vR;
+        varying highp vec2 vT;
+        varying highp vec2 vB;
+        uniform sampler2D uVelocity;
+
+        void main () {
+            float L = texture2D(uVelocity, vL).x;
+            float R = texture2D(uVelocity, vR).x;
+            float T = texture2D(uVelocity, vT).y;
+            float B = texture2D(uVelocity, vB).y;
+
+            vec2 C = texture2D(uVelocity, vUv).xy;
+            if (vL.x < 0.0) { L = -C.x; }
+            if (vR.x > 1.0) { R = -C.x; }
+            if (vT.y > 1.0) { T = -C.y; }
+            if (vB.y < 0.0) { B = -C.y; }
+
+            float div = 0.5 * (R - L + T - B);
+            gl_FragColor = vec4(div, 0.0, 0.0, 1.0);
+        }
+      `
+    );
+
+    const curlShader = compileShader(
+      gl.FRAGMENT_SHADER,
+      `
+        precision mediump float;
+        precision mediump sampler2D;
+        varying highp vec2 vUv;
+        varying highp vec2 vL;
+        varying highp vec2 vR;
+        varying highp vec2 vT;
+        varying highp vec2 vB;
+        uniform sampler2D uVelocity;
+
+        void main () {
+            float L = texture2D(uVelocity, vL).y;
+            float R = texture2D(uVelocity, vR).y;
+            float T = texture2D(uVelocity, vT).x;
+            float B = texture2D(uVelocity, vB).x;
+            float vorticity = R - L - T + B;
+            gl_FragColor = vec4(0.5 * vorticity, 0.0, 0.0, 1.0);
+        }
+      `
+    );
+
+    const vorticityShader = compileShader(
+      gl.FRAGMENT_SHADER,
+      `
+        precision highp float;
+        precision highp sampler2D;
+        varying vec2 vUv;
+        varying vec2 vL;
+        varying vec2 vR;
+        varying vec2 vT;
+        varying vec2 vB;
+        uniform sampler2D uVelocity;
+        uniform sampler2D uCurl;
+        uniform float curl;
+        uniform float dt;
+
+        void main () {
+            float L = texture2D(uCurl, vL).x;
+            float R = texture2D(uCurl, vR).x;
+            float T = texture2D(uCurl, vT).x;
+            float B = texture2D(uCurl, vB).x;
+            float C = texture2D(uCurl, vUv).x;
+
+            vec2 force = 0.5 * vec2(abs(T) - abs(B), abs(R) - abs(L));
+            force /= length(force) + 0.0001;
+            force *= curl * C;
+            force.y *= -1.0;
+
+            vec2 velocity = texture2D(uVelocity, vUv).xy;
+            velocity += force * dt;
+            velocity = min(max(velocity, -1000.0), 1000.0);
+            gl_FragColor = vec4(velocity, 0.0, 1.0);
+        }
+      `
+    );
+
+    const pressureShader = compileShader(
+      gl.FRAGMENT_SHADER,
+      `
+        precision mediump float;
+        precision mediump sampler2D;
+        varying highp vec2 vUv;
+        varying highp vec2 vL;
+        varying highp vec2 vR;
+        varying highp vec2 vT;
+        varying highp vec2 vB;
+        uniform sampler2D uPressure;
+        uniform sampler2D uDivergence;
+
+        void main () {
+            float L = texture2D(uPressure, vL).x;
+            float R = texture2D(uPressure, vR).x;
+            float T = texture2D(uPressure, vT).x;
+            float B = texture2D(uPressure, vB).x;
+            float C = texture2D(uPressure, vUv).x;
+            float divergence = texture2D(uDivergence, vUv).x;
+            float pressure = (L + R + B + T - divergence) * 0.25;
+            gl_FragColor = vec4(pressure, 0.0, 0.0, 1.0);
+        }
+      `
+    );
+
+    const gradientSubtractShader = compileShader(
+      gl.FRAGMENT_SHADER,
+      `
+        precision mediump float;
+        precision mediump sampler2D;
+        varying highp vec2 vUv;
+        varying highp vec2 vL;
+        varying highp vec2 vR;
+        varying highp vec2 vT;
+        varying highp vec2 vB;
+        uniform sampler2D uPressure;
+        uniform sampler2D uVelocity;
+
+        void main () {
+            float L = texture2D(uPressure, vL).x;
+            float R = texture2D(uPressure, vR).x;
+            float T = texture2D(uPressure, vT).x;
+            float B = texture2D(uPressure, vB).x;
+            vec2 velocity = texture2D(uVelocity, vUv).xy;
+            velocity.xy -= vec2(R - L, T - B);
+            gl_FragColor = vec4(velocity, 0.0, 1.0);
+        }
+      `
+    );
+
+    const blit = (() => {
+      gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, -1, 1, 1, 1, 1, -1]), gl.STATIC_DRAW);
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, gl.createBuffer());
+      gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array([0, 1, 2, 0, 2, 3]), gl.STATIC_DRAW);
+      gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+      gl.enableVertexAttribArray(0);
+      return (target, clear = false) => {
+        if (target == null) {
+          gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+          gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        } else {
+          gl.viewport(0, 0, target.width, target.height);
+          gl.bindFramebuffer(gl.FRAMEBUFFER, target.fbo);
+        }
+        if (clear) {
+          gl.clearColor(0.0, 0.0, 0.0, 1.0);
+          gl.clear(gl.COLOR_BUFFER_BIT);
+        }
+        gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
+      };
+    })();
+
+    let dye, velocity, divergence, curl, pressure;
+
+    const copyProgram = new Program(baseVertexShader, copyShader);
+    const clearProgram = new Program(baseVertexShader, clearShader);
+    const splatProgram = new Program(baseVertexShader, splatShader);
+    const advectionProgram = new Program(baseVertexShader, advectionShader);
+    const divergenceProgram = new Program(baseVertexShader, divergenceShader);
+    const curlProgram = new Program(baseVertexShader, curlShader);
+    const vorticityProgram = new Program(baseVertexShader, vorticityShader);
+    const pressureProgram = new Program(baseVertexShader, pressureShader);
+    const gradienSubtractProgram = new Program(baseVertexShader, gradientSubtractShader);
+    const displayMaterial = new Material(baseVertexShader, displayShaderSource);
+
+    function initFramebuffers() {
+      let simRes = getResolution(config.SIM_RESOLUTION);
+      let dyeRes = getResolution(config.DYE_RESOLUTION);
+      const texType = ext.halfFloatTexType;
+      const rgba = ext.formatRGBA;
+      const rg = ext.formatRG;
+      const r = ext.formatR;
+      const filtering = ext.supportLinearFiltering ? gl.LINEAR : gl.NEAREST;
+      gl.disable(gl.BLEND);
+
+      if (!dye)
+        dye = createDoubleFBO(dyeRes.width, dyeRes.height, rgba.internalFormat, rgba.format, texType, filtering);
+      else
+        dye = resizeDoubleFBO(dye, dyeRes.width, dyeRes.height, rgba.internalFormat, rgba.format, texType, filtering);
+
+      if (!velocity)
+        velocity = createDoubleFBO(simRes.width, simRes.height, rg.internalFormat, rg.format, texType, filtering);
+      else
+        velocity = resizeDoubleFBO(
+          velocity,
+          simRes.width,
+          simRes.height,
+          rg.internalFormat,
+          rg.format,
+          texType,
+          filtering
+        );
+
+      divergence = createFBO(simRes.width, simRes.height, r.internalFormat, r.format, texType, gl.NEAREST);
+      curl = createFBO(simRes.width, simRes.height, r.internalFormat, r.format, texType, gl.NEAREST);
+      pressure = createDoubleFBO(simRes.width, simRes.height, r.internalFormat, r.format, texType, gl.NEAREST);
+    }
+
+    function createFBO(w, h, internalFormat, format, type, param) {
+      gl.activeTexture(gl.TEXTURE0);
+      let texture = gl.createTexture();
+      gl.bindTexture(gl.TEXTURE_2D, texture);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, param);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, param);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      gl.texImage2D(gl.TEXTURE_2D, 0, internalFormat, w, h, 0, format, type, null);
+
+      let fbo = gl.createFramebuffer();
+      gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
+      gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
+      gl.viewport(0, 0, w, h);
+      gl.clear(gl.COLOR_BUFFER_BIT);
+
+      let texelSizeX = 1.0 / w;
+      let texelSizeY = 1.0 / h;
+      return {
+        texture,
+        fbo,
+        width: w,
+        height: h,
+        texelSizeX,
+        texelSizeY,
+        attach(id) {
+          gl.activeTexture(gl.TEXTURE0 + id);
+          gl.bindTexture(gl.TEXTURE_2D, texture);
+          return id;
+        }
+      };
+    }
+
+    function createDoubleFBO(w, h, internalFormat, format, type, param) {
+      let fbo1 = createFBO(w, h, internalFormat, format, type, param);
+      let fbo2 = createFBO(w, h, internalFormat, format, type, param);
+      return {
+        width: w,
+        height: h,
+        texelSizeX: fbo1.texelSizeX,
+        texelSizeY: fbo1.texelSizeY,
+        get read() {
+          return fbo1;
+        },
+        set read(value) {
+          fbo1 = value;
+        },
+        get write() {
+          return fbo2;
+        },
+        set write(value) {
+          fbo2 = value;
+        },
+        swap() {
+          let temp = fbo1;
+          fbo1 = fbo2;
+          fbo2 = temp;
+        }
+      };
+    }
+
+    function resizeFBO(target, w, h, internalFormat, format, type, param) {
+      let newFBO = createFBO(w, h, internalFormat, format, type, param);
+      copyProgram.bind();
+      gl.uniform1i(copyProgram.uniforms.uTexture, target.attach(0));
+      blit(newFBO);
+      return newFBO;
+    }
+
+    function resizeDoubleFBO(target, w, h, internalFormat, format, type, param) {
+      if (target.width === w && target.height === h) return target;
+      target.read = resizeFBO(target.read, w, h, internalFormat, format, type, param);
+      target.write = createFBO(w, h, internalFormat, format, type, param);
+      target.width = w;
+      target.height = h;
+      target.texelSizeX = 1.0 / w;
+      target.texelSizeY = 1.0 / h;
+      return target;
+    }
+
+    function updateKeywords() {
+      let displayKeywords = [];
+      if (config.SHADING) displayKeywords.push('SHADING');
+      displayMaterial.setKeywords(displayKeywords);
+    }
+
+    updateKeywords();
+    initFramebuffers();
+    let lastUpdateTime = Date.now();
+    let colorUpdateTimer = 0.0;
+
+    function updateFrame() {
+      if (!isActive) return;
+      const dt = calcDeltaTime();
+      if (resizeCanvas()) initFramebuffers();
+      updateColors(dt);
+      applyInputs();
+      step(dt);
+      render(null);
+      animationFrameId.current = requestAnimationFrame(updateFrame);
+    }
+
+    function calcDeltaTime() {
+      let now = Date.now();
+      let dt = (now - lastUpdateTime) / 1000;
+      dt = Math.min(dt, 0.016666);
+      lastUpdateTime = now;
+      return dt;
+    }
+
+    function resizeCanvas() {
+      let width = scaleByPixelRatio(canvas.clientWidth);
+      let height = scaleByPixelRatio(canvas.clientHeight);
+      if (canvas.width !== width || canvas.height !== height) {
+        canvas.width = width;
+        canvas.height = height;
+        return true;
+      }
+      return false;
+    }
+
+    function updateColors(dt) {
+      colorUpdateTimer += dt * config.COLOR_UPDATE_SPEED;
+      if (colorUpdateTimer >= 1) {
+        colorUpdateTimer = wrap(colorUpdateTimer, 0, 1);
+        pointers.forEach(p => {
+          p.color = generateColor();
+        });
+      }
+    }
+
+    function applyInputs() {
+      pointers.forEach(p => {
+        if (p.moved) {
+          p.moved = false;
+          splatPointer(p);
+        }
+      });
+    }
+
+    function step(dt) {
+      gl.disable(gl.BLEND);
+      curlProgram.bind();
+      gl.uniform2f(curlProgram.uniforms.texelSize, velocity.texelSizeX, velocity.texelSizeY);
+      gl.uniform1i(curlProgram.uniforms.uVelocity, velocity.read.attach(0));
+      blit(curl);
+
+      vorticityProgram.bind();
+      gl.uniform2f(vorticityProgram.uniforms.texelSize, velocity.texelSizeX, velocity.texelSizeY);
+      gl.uniform1i(vorticityProgram.uniforms.uVelocity, velocity.read.attach(0));
+      gl.uniform1i(vorticityProgram.uniforms.uCurl, curl.attach(1));
+      gl.uniform1f(vorticityProgram.uniforms.curl, config.CURL);
+      gl.uniform1f(vorticityProgram.uniforms.dt, dt);
+      blit(velocity.write);
+      velocity.swap();
+
+      divergenceProgram.bind();
+      gl.uniform2f(divergenceProgram.uniforms.texelSize, velocity.texelSizeX, velocity.texelSizeY);
+      gl.uniform1i(divergenceProgram.uniforms.uVelocity, velocity.read.attach(0));
+      blit(divergence);
+
+      clearProgram.bind();
+      gl.uniform1i(clearProgram.uniforms.uTexture, pressure.read.attach(0));
+      gl.uniform1f(clearProgram.uniforms.value, config.PRESSURE);
+      blit(pressure.write);
+      pressure.swap();
+
+      pressureProgram.bind();
+      gl.uniform2f(pressureProgram.uniforms.texelSize, velocity.texelSizeX, velocity.texelSizeY);
+      gl.uniform1i(pressureProgram.uniforms.uDivergence, divergence.attach(0));
+      for (let i = 0; i < config.PRESSURE_ITERATIONS; i++) {
+        gl.uniform1i(pressureProgram.uniforms.uPressure, pressure.read.attach(1));
+        blit(pressure.write);
+        pressure.swap();
+      }
+
+      gradienSubtractProgram.bind();
+      gl.uniform2f(gradienSubtractProgram.uniforms.texelSize, velocity.texelSizeX, velocity.texelSizeY);
+      gl.uniform1i(gradienSubtractProgram.uniforms.uPressure, pressure.read.attach(0));
+      gl.uniform1i(gradienSubtractProgram.uniforms.uVelocity, velocity.read.attach(1));
+      blit(velocity.write);
+      velocity.swap();
+
+      advectionProgram.bind();
+      gl.uniform2f(advectionProgram.uniforms.texelSize, velocity.texelSizeX, velocity.texelSizeY);
+      if (!ext.supportLinearFiltering)
+        gl.uniform2f(advectionProgram.uniforms.dyeTexelSize, velocity.texelSizeX, velocity.texelSizeY);
+      let velocityId = velocity.read.attach(0);
+      gl.uniform1i(advectionProgram.uniforms.uVelocity, velocityId);
+      gl.uniform1i(advectionProgram.uniforms.uSource, velocityId);
+      gl.uniform1f(advectionProgram.uniforms.dt, dt);
+      gl.uniform1f(advectionProgram.uniforms.dissipation, config.VELOCITY_DISSIPATION);
+      blit(velocity.write);
+      velocity.swap();
+
+      if (!ext.supportLinearFiltering)
+        gl.uniform2f(advectionProgram.uniforms.dyeTexelSize, dye.texelSizeX, dye.texelSizeY);
+      gl.uniform1i(advectionProgram.uniforms.uVelocity, velocity.read.attach(0));
+      gl.uniform1i(advectionProgram.uniforms.uSource, dye.read.attach(1));
+      gl.uniform1f(advectionProgram.uniforms.dissipation, config.DENSITY_DISSIPATION);
+      blit(dye.write);
+      dye.swap();
+    }
+
+    function render(target) {
+      gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+      gl.enable(gl.BLEND);
+      drawDisplay(target);
+    }
+
+    function drawDisplay(target) {
+      let width = target == null ? gl.drawingBufferWidth : target.width;
+      let height = target == null ? gl.drawingBufferHeight : target.height;
+      displayMaterial.bind();
+      if (config.SHADING) gl.uniform2f(displayMaterial.uniforms.texelSize, 1.0 / width, 1.0 / height);
+      gl.uniform1i(displayMaterial.uniforms.uTexture, dye.read.attach(0));
+      blit(target);
+    }
+
+    function splatPointer(pointer) {
+      let dx = pointer.deltaX * config.SPLAT_FORCE;
+      let dy = pointer.deltaY * config.SPLAT_FORCE;
+      splat(pointer.texcoordX, pointer.texcoordY, dx, dy, pointer.color);
+    }
+
+    function clickSplat(pointer) {
+      const color = generateColor();
+      color.r *= 10.0;
+      color.g *= 10.0;
+      color.b *= 10.0;
+      let dx = 10 * (Math.random() - 0.5);
+      let dy = 30 * (Math.random() - 0.5);
+      splat(pointer.texcoordX, pointer.texcoordY, dx, dy, color);
+    }
+
+    function splat(x, y, dx, dy, color) {
+      splatProgram.bind();
+      gl.uniform1i(splatProgram.uniforms.uTarget, velocity.read.attach(0));
+      gl.uniform1f(splatProgram.uniforms.aspectRatio, canvas.width / canvas.height);
+      gl.uniform2f(splatProgram.uniforms.point, x, y);
+      gl.uniform3f(splatProgram.uniforms.color, dx, dy, 0.0);
+      gl.uniform1f(splatProgram.uniforms.radius, correctRadius(config.SPLAT_RADIUS / 100.0));
+      blit(velocity.write);
+      velocity.swap();
+
+      gl.uniform1i(splatProgram.uniforms.uTarget, dye.read.attach(0));
+      gl.uniform3f(splatProgram.uniforms.color, color.r, color.g, color.b);
+      blit(dye.write);
+      dye.swap();
+    }
+
+    function correctRadius(radius) {
+      let aspectRatio = canvas.width / canvas.height;
+      if (aspectRatio > 1) radius *= aspectRatio;
+      return radius;
+    }
+
+    function updatePointerDownData(pointer, id, posX, posY) {
+      pointer.id = id;
+      pointer.down = true;
+      pointer.moved = false;
+      pointer.texcoordX = posX / canvas.width;
+      pointer.texcoordY = 1.0 - posY / canvas.height;
+      pointer.prevTexcoordX = pointer.texcoordX;
+      pointer.prevTexcoordY = pointer.texcoordY;
+      pointer.deltaX = 0;
+      pointer.deltaY = 0;
+      pointer.color = generateColor();
+    }
+
+    function updatePointerMoveData(pointer, posX, posY, color) {
+      pointer.prevTexcoordX = pointer.texcoordX;
+      pointer.prevTexcoordY = pointer.texcoordY;
+      pointer.texcoordX = posX / canvas.width;
+      pointer.texcoordY = 1.0 - posY / canvas.height;
+      pointer.deltaX = correctDeltaX(pointer.texcoordX - pointer.prevTexcoordX);
+      pointer.deltaY = correctDeltaY(pointer.texcoordY - pointer.prevTexcoordY);
+      pointer.moved = Math.abs(pointer.deltaX) > 0 || Math.abs(pointer.deltaY) > 0;
+      pointer.color = color;
+    }
+
+    function updatePointerUpData(pointer) {
+      pointer.down = false;
+    }
+
+    function correctDeltaX(delta) {
+      let aspectRatio = canvas.width / canvas.height;
+      if (aspectRatio < 1) delta *= aspectRatio;
+      return delta;
+    }
+
+    function correctDeltaY(delta) {
+      let aspectRatio = canvas.width / canvas.height;
+      if (aspectRatio > 1) delta /= aspectRatio;
+      return delta;
+    }
+
+    function hexToRGB(hex) {
+      let val = hex.replace('#', '');
+      if (val.length === 3) val = val[0] + val[0] + val[1] + val[1] + val[2] + val[2];
+      const r = parseInt(val.slice(0, 2), 16) / 255;
+      const g = parseInt(val.slice(2, 4), 16) / 255;
+      const b = parseInt(val.slice(4, 6), 16) / 255;
+      return { r: r * 0.15, g: g * 0.15, b: b * 0.15 };
+    }
+
+    function generateColor() {
+      if (!config.RAINBOW_MODE) {
+        return hexToRGB(config.COLOR);
+      }
+      let c = HSVtoRGB(Math.random(), 1.0, 1.0);
+      c.r *= 0.15;
+      c.g *= 0.15;
+      c.b *= 0.15;
+      return c;
+    }
+
+    function HSVtoRGB(h, s, v) {
+      let r, g, b, i, f, p, q, t;
+      i = Math.floor(h * 6);
+      f = h * 6 - i;
+      p = v * (1 - s);
+      q = v * (1 - f * s);
+      t = v * (1 - (1 - f) * s);
+      switch (i % 6) {
+        case 0:
+          r = v;
+          g = t;
+          b = p;
+          break;
+        case 1:
+          r = q;
+          g = v;
+          b = p;
+          break;
+        case 2:
+          r = p;
+          g = v;
+          b = t;
+          break;
+        case 3:
+          r = p;
+          g = q;
+          b = v;
+          break;
+        case 4:
+          r = t;
+          g = p;
+          b = v;
+          break;
+        case 5:
+          r = v;
+          g = p;
+          b = q;
+          break;
+        default:
+          break;
+      }
+      return { r, g, b };
+    }
+
+    function wrap(value, min, max) {
+      const range = max - min;
+      if (range === 0) return min;
+      return ((value - min) % range) + min;
+    }
+
+    function getResolution(resolution) {
+      let aspectRatio = gl.drawingBufferWidth / gl.drawingBufferHeight;
+      if (aspectRatio < 1) aspectRatio = 1.0 / aspectRatio;
+      const min = Math.round(resolution);
+      const max = Math.round(resolution * aspectRatio);
+      if (gl.drawingBufferWidth > gl.drawingBufferHeight) return { width: max, height: min };
+      else return { width: min, height: max };
+    }
+
+    function scaleByPixelRatio(input) {
+      const pixelRatio = window.devicePixelRatio || 1;
+      return Math.floor(input * pixelRatio);
+    }
+
+    function hashCode(s) {
+      if (s.length === 0) return 0;
+      let hash = 0;
+      for (let i = 0; i < s.length; i++) {
+        hash = (hash << 5) - hash + s.charCodeAt(i);
+        hash |= 0;
+      }
+      return hash;
+    }
+
+    // Named event handlers for proper cleanup
+    function handleMouseDown(e) {
+      let pointer = pointers[0];
+      let posX = scaleByPixelRatio(e.clientX);
+      let posY = scaleByPixelRatio(e.clientY);
+      updatePointerDownData(pointer, -1, posX, posY);
+      clickSplat(pointer);
+    }
+
+    let firstMouseMoveHandled = false;
+    function handleMouseMove(e) {
+      let pointer = pointers[0];
+      let posX = scaleByPixelRatio(e.clientX);
+      let posY = scaleByPixelRatio(e.clientY);
+      if (!firstMouseMoveHandled) {
+        let color = generateColor();
+        updatePointerMoveData(pointer, posX, posY, color);
+        firstMouseMoveHandled = true;
+      } else {
+        updatePointerMoveData(pointer, posX, posY, pointer.color);
+      }
+    }
+
+    function handleTouchStart(e) {
+      const touches = e.targetTouches;
+      let pointer = pointers[0];
+      for (let i = 0; i < touches.length; i++) {
+        let posX = scaleByPixelRatio(touches[i].clientX);
+        let posY = scaleByPixelRatio(touches[i].clientY);
+        updatePointerDownData(pointer, touches[i].identifier, posX, posY);
+      }
+    }
+
+    function handleTouchMove(e) {
+      const touches = e.targetTouches;
+      let pointer = pointers[0];
+      for (let i = 0; i < touches.length; i++) {
+        let posX = scaleByPixelRatio(touches[i].clientX);
+        let posY = scaleByPixelRatio(touches[i].clientY);
+        updatePointerMoveData(pointer, posX, posY, pointer.color);
+      }
+    }
+
+    function handleTouchEnd(e) {
+      const touches = e.changedTouches;
+      let pointer = pointers[0];
+      for (let i = 0; i < touches.length; i++) {
+        updatePointerUpData(pointer);
+      }
+    }
+
+    // Add event listeners
+    window.addEventListener('mousedown', handleMouseDown);
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('touchstart', handleTouchStart);
+    window.addEventListener('touchmove', handleTouchMove, false);
+    window.addEventListener('touchend', handleTouchEnd);
+
+    updateFrame();
+
+    // Cleanup function
+    return () => {
+      isActive = false;
+
+      // Cancel animation frame
+      if (animationFrameId.current) {
+        cancelAnimationFrame(animationFrameId.current);
+        animationFrameId.current = null;
+      }
+
+      // Remove event listeners
+      window.removeEventListener('mousedown', handleMouseDown);
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('touchmove', handleTouchMove);
+      window.removeEventListener('touchend', handleTouchEnd);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return (
+    <div
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        zIndex: 50,
+        pointerEvents: 'none',
+        width: '100%',
+        height: '100%'
+      }}
+    >
+      <canvas
+        ref={canvasRef}
+        id="fluid"
+        style={{
+          width: '100vw',
+          height: '100vh',
+          display: 'block'
+        }}
+      />
+    </div>
+  );
+}
+
+export default SplashCursor;
+
+C.	Component Documentation
+1.	 Animated List
+CLI : npx shadcn@latest add @react-bits/AnimatedList-JS-CSS
+Usage : 
+import AnimatedList from './AnimatedList'
+
+const items = ['Item 1', 'Item 2', 'Item 3', 'Item 4', 'Item 5', 'Item 6', 'Item 7', 'Item 8', 'Item 9', 'Item 10']; 
+  
+<AnimatedList
+  items={items}
+  onItemSelect={(item, index) => console.log(item, index)}
+  showGradients
+  enableArrowNavigation
+  displayScrollbar
+/>
+
+Code :
+import { useRef, useState, useEffect, useCallback } from 'react';
+import { motion, useInView } from 'motion/react';
+import './AnimatedList.css';
+
+const AnimatedItem = ({ children, delay = 0, index, onMouseEnter, onClick }) => {
+  const ref = useRef(null);
+  const inView = useInView(ref, { amount: 0.5, triggerOnce: false });
+  return (
+    <motion.div
+      ref={ref}
+      data-index={index}
+      onMouseEnter={onMouseEnter}
+      onClick={onClick}
+      initial={{ scale: 0.7, opacity: 0 }}
+      animate={inView ? { scale: 1, opacity: 1 } : { scale: 0.7, opacity: 0 }}
+      transition={{ duration: 0.2, delay }}
+      style={{ marginBottom: '1rem', cursor: 'pointer' }}
+    >
+      {children}
+    </motion.div>
+  );
+};
+
+const AnimatedList = ({
+  items = [
+    'Item 1',
+    'Item 2',
+    'Item 3',
+    'Item 4',
+    'Item 5',
+    'Item 6',
+    'Item 7',
+    'Item 8',
+    'Item 9',
+    'Item 10',
+    'Item 11',
+    'Item 12',
+    'Item 13',
+    'Item 14',
+    'Item 15'
+  ],
+  onItemSelect,
+  showGradients = true,
+  enableArrowNavigation = true,
+  className = '',
+  itemClassName = '',
+  displayScrollbar = true,
+  initialSelectedIndex = -1
+}) => {
+  const listRef = useRef(null);
+  const [selectedIndex, setSelectedIndex] = useState(initialSelectedIndex);
+  const [keyboardNav, setKeyboardNav] = useState(false);
+  const [topGradientOpacity, setTopGradientOpacity] = useState(0);
+  const [bottomGradientOpacity, setBottomGradientOpacity] = useState(1);
+
+  const handleItemMouseEnter = useCallback(index => {
+    setSelectedIndex(index);
+  }, []);
+
+  const handleItemClick = useCallback(
+    (item, index) => {
+      setSelectedIndex(index);
+      if (onItemSelect) {
+        onItemSelect(item, index);
+      }
+    },
+    [onItemSelect]
+  );
+
+  const handleScroll = useCallback(e => {
+    const { scrollTop, scrollHeight, clientHeight } = e.target;
+    setTopGradientOpacity(Math.min(scrollTop / 50, 1));
+    const bottomDistance = scrollHeight - (scrollTop + clientHeight);
+    setBottomGradientOpacity(scrollHeight <= clientHeight ? 0 : Math.min(bottomDistance / 50, 1));
+  }, []);
+
+  useEffect(() => {
+    if (!enableArrowNavigation) return;
+    const handleKeyDown = e => {
+      if (e.key === 'ArrowDown' || (e.key === 'Tab' && !e.shiftKey)) {
+        e.preventDefault();
+        setKeyboardNav(true);
+        setSelectedIndex(prev => Math.min(prev + 1, items.length - 1));
+      } else if (e.key === 'ArrowUp' || (e.key === 'Tab' && e.shiftKey)) {
+        e.preventDefault();
+        setKeyboardNav(true);
+        setSelectedIndex(prev => Math.max(prev - 1, 0));
+      } else if (e.key === 'Enter') {
+        if (selectedIndex >= 0 && selectedIndex < items.length) {
+          e.preventDefault();
+          if (onItemSelect) {
+            onItemSelect(items[selectedIndex], selectedIndex);
+          }
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [items, selectedIndex, onItemSelect, enableArrowNavigation]);
+
+  useEffect(() => {
+    if (!keyboardNav || selectedIndex < 0 || !listRef.current) return;
+    const container = listRef.current;
+    const selectedItem = container.querySelector(`[data-index="${selectedIndex}"]`);
+    if (selectedItem) {
+      const extraMargin = 50;
+      const containerScrollTop = container.scrollTop;
+      const containerHeight = container.clientHeight;
+      const itemTop = selectedItem.offsetTop;
+      const itemBottom = itemTop + selectedItem.offsetHeight;
+      if (itemTop < containerScrollTop + extraMargin) {
+        container.scrollTo({ top: itemTop - extraMargin, behavior: 'smooth' });
+      } else if (itemBottom > containerScrollTop + containerHeight - extraMargin) {
+        container.scrollTo({
+          top: itemBottom - containerHeight + extraMargin,
+          behavior: 'smooth'
+        });
+      }
+    }
+    setKeyboardNav(false);
+  }, [selectedIndex, keyboardNav]);
+
+  return (
+    <div className={`scroll-list-container ${className}`}>
+      <div ref={listRef} className={`scroll-list ${!displayScrollbar ? 'no-scrollbar' : ''}`} onScroll={handleScroll}>
+        {items.map((item, index) => (
+          <AnimatedItem
+            key={index}
+            delay={0.1}
+            index={index}
+            onMouseEnter={() => handleItemMouseEnter(index)}
+            onClick={() => handleItemClick(item, index)}
+          >
+            <div className={`item ${selectedIndex === index ? 'selected' : ''} ${itemClassName}`}>
+              <p className="item-text">{item}</p>
+            </div>
+          </AnimatedItem>
+        ))}
+      </div>
+      {showGradients && (
+        <>
+          <div className="top-gradient" style={{ opacity: topGradientOpacity }}></div>
+          <div className="bottom-gradient" style={{ opacity: bottomGradientOpacity }}></div>
+        </>
+      )}
+    </div>
+  );
+};
+
+export default AnimatedList;
+
+CSS : 
+.scroll-list-container {
+  position: relative;
+  width: 500px;
+}
+
+.scroll-list {
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 16px;
+}
+
+.scroll-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.scroll-list::-webkit-scrollbar-track {
+  background: #120F17;
+}
+
+.scroll-list::-webkit-scrollbar-thumb {
+  background: #2F293A;
+  border-radius: 4px;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.item {
+  padding: 16px;
+  background-color: #2F293A;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.item.selected {
+  background-color: #2F293A;
+}
+
+.item-text {
+  color: white;
+  margin: 0;
+}
+
+.top-gradient {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50px;
+  background: linear-gradient(to bottom, #120F17, transparent);
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.bottom-gradient {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 100px;
+  background: linear-gradient(to top, #120F17, transparent);
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+2.	Circullar Gallery 
+CLI : npx shadcn@latest add @react-bits/CircularGallery-JS-CSS
+Usage : 
+import CircularGallery from './CircularGallery'
+
+<div style={{ height: '600px', position: 'relative' }}>
+  <CircularGallery bend={3} textColor="#ffffff" borderRadius={0.05} scrollEase={0.02}
+  bend={1}
+  borderRadius={0.05}
+  scrollSpeed={2}
+  scrollEase={0.05}
+/>
+</div>
+Code : 
+import { Camera, Mesh, Plane, Program, Renderer, Texture, Transform } from 'ogl';
+import { useEffect, useRef } from 'react';
+
+import './CircularGallery.css';
+
+function debounce(func, wait) {
+  let timeout;
+  return function (...args) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(this, args), wait);
+  };
+}
+
+function lerp(p1, p2, t) {
+  return p1 + (p2 - p1) * t;
+}
+
+function autoBind(instance) {
+  const proto = Object.getPrototypeOf(instance);
+  Object.getOwnPropertyNames(proto).forEach(key => {
+    if (key !== 'constructor' && typeof instance[key] === 'function') {
+      instance[key] = instance[key].bind(instance);
+    }
+  });
+}
+
+function createTextTexture(gl, text, font = 'bold 30px monospace', color = 'black') {
+  const canvas = document.createElement('canvas');
+  const context = canvas.getContext('2d');
+  context.font = font;
+  const metrics = context.measureText(text);
+  const textWidth = Math.ceil(metrics.width);
+  const textHeight = Math.ceil(parseInt(font, 10) * 1.2);
+  canvas.width = textWidth + 20;
+  canvas.height = textHeight + 20;
+  context.font = font;
+  context.fillStyle = color;
+  context.textBaseline = 'middle';
+  context.textAlign = 'center';
+  context.clearRect(0, 0, canvas.width, canvas.height);
+  context.fillText(text, canvas.width / 2, canvas.height / 2);
+  const texture = new Texture(gl, { generateMipmaps: false });
+  texture.image = canvas;
+  return { texture, width: canvas.width, height: canvas.height };
+}
+
+class Title {
+  constructor({ gl, plane, renderer, text, textColor = '#545050', font = '30px sans-serif' }) {
+    autoBind(this);
+    this.gl = gl;
+    this.plane = plane;
+    this.renderer = renderer;
+    this.text = text;
+    this.textColor = textColor;
+    this.font = font;
+    this.createMesh();
+  }
+  createMesh() {
+    const { texture, width, height } = createTextTexture(this.gl, this.text, this.font, this.textColor);
+    const geometry = new Plane(this.gl);
+    const program = new Program(this.gl, {
+      vertex: `
+        attribute vec3 position;
+        attribute vec2 uv;
+        uniform mat4 modelViewMatrix;
+        uniform mat4 projectionMatrix;
+        varying vec2 vUv;
+        void main() {
+          vUv = uv;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `,
+      fragment: `
+        precision highp float;
+        uniform sampler2D tMap;
+        varying vec2 vUv;
+        void main() {
+          vec4 color = texture2D(tMap, vUv);
+          if (color.a < 0.1) discard;
+          gl_FragColor = color;
+        }
+      `,
+      uniforms: { tMap: { value: texture } },
+      transparent: true
+    });
+    this.mesh = new Mesh(this.gl, { geometry, program });
+    const aspect = width / height;
+    const textHeight = this.plane.scale.y * 0.15;
+    const textWidth = textHeight * aspect;
+    this.mesh.scale.set(textWidth, textHeight, 1);
+    this.mesh.position.y = -this.plane.scale.y * 0.5 - textHeight * 0.5 - 0.05;
+    this.mesh.setParent(this.plane);
+  }
+}
+
+class Media {
+  constructor({
+    geometry,
+    gl,
+    image,
+    index,
+    length,
+    renderer,
+    scene,
+    screen,
+    text,
+    viewport,
+    bend,
+    textColor,
+    borderRadius = 0,
+    font
+  }) {
+    this.extra = 0;
+    this.geometry = geometry;
+    this.gl = gl;
+    this.image = image;
+    this.index = index;
+    this.length = length;
+    this.renderer = renderer;
+    this.scene = scene;
+    this.screen = screen;
+    this.text = text;
+    this.viewport = viewport;
+    this.bend = bend;
+    this.textColor = textColor;
+    this.borderRadius = borderRadius;
+    this.font = font;
+    this.createShader();
+    this.createMesh();
+    this.createTitle();
+    this.onResize();
+  }
+  createShader() {
+    const texture = new Texture(this.gl, {
+      generateMipmaps: true
+    });
+    this.program = new Program(this.gl, {
+      depthTest: false,
+      depthWrite: false,
+      vertex: `
+        precision highp float;
+        attribute vec3 position;
+        attribute vec2 uv;
+        uniform mat4 modelViewMatrix;
+        uniform mat4 projectionMatrix;
+        uniform float uTime;
+        uniform float uSpeed;
+        varying vec2 vUv;
+        void main() {
+          vUv = uv;
+          vec3 p = position;
+          p.z = (sin(p.x * 4.0 + uTime) * 1.5 + cos(p.y * 2.0 + uTime) * 1.5) * (0.1 + uSpeed * 0.5);
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0);
+        }
+      `,
+      fragment: `
+        precision highp float;
+        uniform vec2 uImageSizes;
+        uniform vec2 uPlaneSizes;
+        uniform sampler2D tMap;
+        uniform float uBorderRadius;
+        varying vec2 vUv;
+        
+        float roundedBoxSDF(vec2 p, vec2 b, float r) {
+          vec2 d = abs(p) - b;
+          return length(max(d, vec2(0.0))) + min(max(d.x, d.y), 0.0) - r;
+        }
+        
+        void main() {
+          vec2 ratio = vec2(
+            min((uPlaneSizes.x / uPlaneSizes.y) / (uImageSizes.x / uImageSizes.y), 1.0),
+            min((uPlaneSizes.y / uPlaneSizes.x) / (uImageSizes.y / uImageSizes.x), 1.0)
+          );
+          vec2 uv = vec2(
+            vUv.x * ratio.x + (1.0 - ratio.x) * 0.5,
+            vUv.y * ratio.y + (1.0 - ratio.y) * 0.5
+          );
+          vec4 color = texture2D(tMap, uv);
+          
+          float d = roundedBoxSDF(vUv - 0.5, vec2(0.5 - uBorderRadius), uBorderRadius);
+          
+          // Smooth antialiasing for edges
+          float edgeSmooth = 0.002;
+          float alpha = 1.0 - smoothstep(-edgeSmooth, edgeSmooth, d);
+          
+          gl_FragColor = vec4(color.rgb, alpha);
+        }
+      `,
+      uniforms: {
+        tMap: { value: texture },
+        uPlaneSizes: { value: [0, 0] },
+        uImageSizes: { value: [0, 0] },
+        uSpeed: { value: 0 },
+        uTime: { value: 100 * Math.random() },
+        uBorderRadius: { value: this.borderRadius }
+      },
+      transparent: true
+    });
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.src = this.image;
+    img.onload = () => {
+      texture.image = img;
+      this.program.uniforms.uImageSizes.value = [img.naturalWidth, img.naturalHeight];
+    };
+  }
+  createMesh() {
+    this.plane = new Mesh(this.gl, {
+      geometry: this.geometry,
+      program: this.program
+    });
+    this.plane.setParent(this.scene);
+  }
+  createTitle() {
+    this.title = new Title({
+      gl: this.gl,
+      plane: this.plane,
+      renderer: this.renderer,
+      text: this.text,
+      textColor: this.textColor,
+      fontFamily: this.font
+    });
+  }
+  update(scroll, direction) {
+    this.plane.position.x = this.x - scroll.current - this.extra;
+
+    const x = this.plane.position.x;
+    const H = this.viewport.width / 2;
+
+    if (this.bend === 0) {
+      this.plane.position.y = 0;
+      this.plane.rotation.z = 0;
+    } else {
+      const B_abs = Math.abs(this.bend);
+      const R = (H * H + B_abs * B_abs) / (2 * B_abs);
+      const effectiveX = Math.min(Math.abs(x), H);
+
+      const arc = R - Math.sqrt(R * R - effectiveX * effectiveX);
+      if (this.bend > 0) {
+        this.plane.position.y = -arc;
+        this.plane.rotation.z = -Math.sign(x) * Math.asin(effectiveX / R);
+      } else {
+        this.plane.position.y = arc;
+        this.plane.rotation.z = Math.sign(x) * Math.asin(effectiveX / R);
+      }
+    }
+
+    this.speed = scroll.current - scroll.last;
+    this.program.uniforms.uTime.value += 0.04;
+    this.program.uniforms.uSpeed.value = this.speed;
+
+    const planeOffset = this.plane.scale.x / 2;
+    const viewportOffset = this.viewport.width / 2;
+    this.isBefore = this.plane.position.x + planeOffset < -viewportOffset;
+    this.isAfter = this.plane.position.x - planeOffset > viewportOffset;
+    if (direction === 'right' && this.isBefore) {
+      this.extra -= this.widthTotal;
+      this.isBefore = this.isAfter = false;
+    }
+    if (direction === 'left' && this.isAfter) {
+      this.extra += this.widthTotal;
+      this.isBefore = this.isAfter = false;
+    }
+  }
+  onResize({ screen, viewport } = {}) {
+    if (screen) this.screen = screen;
+    if (viewport) {
+      this.viewport = viewport;
+      if (this.plane.program.uniforms.uViewportSizes) {
+        this.plane.program.uniforms.uViewportSizes.value = [this.viewport.width, this.viewport.height];
+      }
+    }
+    this.scale = this.screen.height / 1500;
+    this.plane.scale.y = (this.viewport.height * (900 * this.scale)) / this.screen.height;
+    this.plane.scale.x = (this.viewport.width * (700 * this.scale)) / this.screen.width;
+    this.plane.program.uniforms.uPlaneSizes.value = [this.plane.scale.x, this.plane.scale.y];
+    this.padding = 2;
+    this.width = this.plane.scale.x + this.padding;
+    this.widthTotal = this.width * this.length;
+    this.x = this.width * this.index;
+  }
+}
+
+class App {
+  constructor(
+    container,
+    {
+      items,
+      bend,
+      textColor = '#ffffff',
+      borderRadius = 0,
+      font = 'bold 30px Figtree',
+      scrollSpeed = 2,
+      scrollEase = 0.05
+    } = {}
+  ) {
+    document.documentElement.classList.remove('no-js');
+    this.container = container;
+    this.scrollSpeed = scrollSpeed;
+    this.scroll = { ease: scrollEase, current: 0, target: 0, last: 0 };
+    this.onCheckDebounce = debounce(this.onCheck, 200);
+    this.createRenderer();
+    this.createCamera();
+    this.createScene();
+    this.onResize();
+    this.createGeometry();
+    this.createMedias(items, bend, textColor, borderRadius, font);
+    this.update();
+    this.addEventListeners();
+  }
+  createRenderer() {
+    this.renderer = new Renderer({
+      alpha: true,
+      antialias: true,
+      dpr: Math.min(window.devicePixelRatio || 1, 2)
+    });
+    this.gl = this.renderer.gl;
+    this.gl.clearColor(0, 0, 0, 0);
+    this.container.appendChild(this.gl.canvas);
+  }
+  createCamera() {
+    this.camera = new Camera(this.gl);
+    this.camera.fov = 45;
+    this.camera.position.z = 20;
+  }
+  createScene() {
+    this.scene = new Transform();
+  }
+  createGeometry() {
+    this.planeGeometry = new Plane(this.gl, {
+      heightSegments: 50,
+      widthSegments: 100
+    });
+  }
+  createMedias(items, bend = 1, textColor, borderRadius, font) {
+    const defaultItems = [
+      { image: `https://picsum.photos/seed/1/800/600?grayscale`, text: 'Bridge' },
+      { image: `https://picsum.photos/seed/2/800/600?grayscale`, text: 'Desk Setup' },
+      { image: `https://picsum.photos/seed/3/800/600?grayscale`, text: 'Waterfall' },
+      { image: `https://picsum.photos/seed/4/800/600?grayscale`, text: 'Strawberries' },
+      { image: `https://picsum.photos/seed/5/800/600?grayscale`, text: 'Deep Diving' },
+      { image: `https://picsum.photos/seed/16/800/600?grayscale`, text: 'Train Track' },
+      { image: `https://picsum.photos/seed/17/800/600?grayscale`, text: 'Santorini' },
+      { image: `https://picsum.photos/seed/8/800/600?grayscale`, text: 'Blurry Lights' },
+      { image: `https://picsum.photos/seed/9/800/600?grayscale`, text: 'New York' },
+      { image: `https://picsum.photos/seed/10/800/600?grayscale`, text: 'Good Boy' },
+      { image: `https://picsum.photos/seed/21/800/600?grayscale`, text: 'Coastline' },
+      { image: `https://picsum.photos/seed/12/800/600?grayscale`, text: 'Palm Trees' }
+    ];
+    const galleryItems = items && items.length ? items : defaultItems;
+    this.mediasImages = galleryItems.concat(galleryItems);
+    this.medias = this.mediasImages.map((data, index) => {
+      return new Media({
+        geometry: this.planeGeometry,
+        gl: this.gl,
+        image: data.image,
+        index,
+        length: this.mediasImages.length,
+        renderer: this.renderer,
+        scene: this.scene,
+        screen: this.screen,
+        text: data.text,
+        viewport: this.viewport,
+        bend,
+        textColor,
+        borderRadius,
+        font
+      });
+    });
+  }
+  onTouchDown(e) {
+    this.isDown = true;
+    this.scroll.position = this.scroll.current;
+    this.start = e.touches ? e.touches[0].clientX : e.clientX;
+  }
+  onTouchMove(e) {
+    if (!this.isDown) return;
+    const x = e.touches ? e.touches[0].clientX : e.clientX;
+    const distance = (this.start - x) * (this.scrollSpeed * 0.025);
+    this.scroll.target = this.scroll.position + distance;
+  }
+  onTouchUp() {
+    this.isDown = false;
+    this.onCheck();
+  }
+  onWheel(e) {
+    const delta = e.deltaY || e.wheelDelta || e.detail;
+    this.scroll.target += (delta > 0 ? this.scrollSpeed : -this.scrollSpeed) * 0.2;
+    this.onCheckDebounce();
+  }
+  onCheck() {
+    if (!this.medias || !this.medias[0]) return;
+    const width = this.medias[0].width;
+    const itemIndex = Math.round(Math.abs(this.scroll.target) / width);
+    const item = width * itemIndex;
+    this.scroll.target = this.scroll.target < 0 ? -item : item;
+  }
+  onResize() {
+    this.screen = {
+      width: this.container.clientWidth,
+      height: this.container.clientHeight
+    };
+    this.renderer.setSize(this.screen.width, this.screen.height);
+    this.camera.perspective({
+      aspect: this.screen.width / this.screen.height
+    });
+    const fov = (this.camera.fov * Math.PI) / 180;
+    const height = 2 * Math.tan(fov / 2) * this.camera.position.z;
+    const width = height * this.camera.aspect;
+    this.viewport = { width, height };
+    if (this.medias) {
+      this.medias.forEach(media => media.onResize({ screen: this.screen, viewport: this.viewport }));
+    }
+  }
+  update() {
+    this.scroll.current = lerp(this.scroll.current, this.scroll.target, this.scroll.ease);
+    const direction = this.scroll.current > this.scroll.last ? 'right' : 'left';
+    if (this.medias) {
+      this.medias.forEach(media => media.update(this.scroll, direction));
+    }
+    this.renderer.render({ scene: this.scene, camera: this.camera });
+    this.scroll.last = this.scroll.current;
+    this.raf = window.requestAnimationFrame(this.update.bind(this));
+  }
+  addEventListeners() {
+    this.boundOnResize = this.onResize.bind(this);
+    this.boundOnWheel = this.onWheel.bind(this);
+    this.boundOnTouchDown = this.onTouchDown.bind(this);
+    this.boundOnTouchMove = this.onTouchMove.bind(this);
+    this.boundOnTouchUp = this.onTouchUp.bind(this);
+    window.addEventListener('resize', this.boundOnResize);
+    window.addEventListener('mousewheel', this.boundOnWheel);
+    window.addEventListener('wheel', this.boundOnWheel);
+    window.addEventListener('mousedown', this.boundOnTouchDown);
+    window.addEventListener('mousemove', this.boundOnTouchMove);
+    window.addEventListener('mouseup', this.boundOnTouchUp);
+    window.addEventListener('touchstart', this.boundOnTouchDown);
+    window.addEventListener('touchmove', this.boundOnTouchMove);
+    window.addEventListener('touchend', this.boundOnTouchUp);
+  }
+  destroy() {
+    window.cancelAnimationFrame(this.raf);
+    window.removeEventListener('resize', this.boundOnResize);
+    window.removeEventListener('mousewheel', this.boundOnWheel);
+    window.removeEventListener('wheel', this.boundOnWheel);
+    window.removeEventListener('mousedown', this.boundOnTouchDown);
+    window.removeEventListener('mousemove', this.boundOnTouchMove);
+    window.removeEventListener('mouseup', this.boundOnTouchUp);
+    window.removeEventListener('touchstart', this.boundOnTouchDown);
+    window.removeEventListener('touchmove', this.boundOnTouchMove);
+    window.removeEventListener('touchend', this.boundOnTouchUp);
+    if (this.renderer && this.renderer.gl && this.renderer.gl.canvas.parentNode) {
+      this.renderer.gl.canvas.parentNode.removeChild(this.renderer.gl.canvas);
+    }
+  }
+}
+
+export default function CircularGallery({
+  items,
+  bend = 3,
+  textColor = '#ffffff',
+  borderRadius = 0.05,
+  font = 'bold 30px Figtree',
+  scrollSpeed = 2,
+  scrollEase = 0.05
+}) {
+  const containerRef = useRef(null);
+  useEffect(() => {
+    const app = new App(containerRef.current, { items, bend, textColor, borderRadius, font, scrollSpeed, scrollEase });
+    return () => {
+      app.destroy();
+    };
+  }, [items, bend, textColor, borderRadius, font, scrollSpeed, scrollEase]);
+  return <div className="circular-gallery" ref={containerRef} />;
+}
+
+CSS : 
+.circular-gallery {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  cursor: grab;
+}
+
+.circular-gallery:active {
+  cursor: grabbing;
+}
+
+3.	Lanyard
+CLI : npx shadcn@latest add @react-bits/Lanyard-JS-CSS
+Usage:
+import Lanyard from './Lanyard'
+
+<Lanyard position={[0, 0, 20]} gravity={[0, -40, 0]} />
+
+/* IMPORTANT INFO BELOW
+1. You MUST have the card.glb and lanyard.png files in your project and import them
+- these can be downloaded from the repo's files, under src/assets/lanyard
+
+2. You can edit your card.glb file in this online .glb editor and change the texture:
+- https://modelviewer.dev/editor/
+
+4. The png file is the texture for the lanyard's band and can be edited in any image editor
+
+5. Your Vite configuration must be updated to include the following in vite.config.js:
+assetsInclude: ['**/*.glb']
+
+6. For TS users, you might need these changes:
+
+- src/global.d.ts
+export { };
+
+declare module '*.glb';
+declare module '*.png';
+
+declare module 'meshline' {
+  export const MeshLineGeometry: any;
+  export const MeshLineMaterial: any;
+}
+
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      meshLineGeometry: any;
+      meshLineMaterial: any;
+    }
+  }
+}
+
+- src/vite-env.d.ts
+/// <reference types="vite/client"
+  position={[0,0,24]}
+  gravity={[0,-40,0]}
+/>
+declare module '*.glb';
+declare module '*.png';
+*/
+
+Code :
+/* eslint-disable react/no-unknown-property */
+'use client';
+import { useEffect, useRef, useState } from 'react';
+import { Canvas, extend, useFrame } from '@react-three/fiber';
+import { useGLTF, useTexture, Environment, Lightformer } from '@react-three/drei';
+import { BallCollider, CuboidCollider, Physics, RigidBody, useRopeJoint, useSphericalJoint } from '@react-three/rapier';
+import { MeshLineGeometry, MeshLineMaterial } from 'meshline';
+
+// replace with your own imports, see the usage snippet for details
+import cardGLB from './card.glb';
+import lanyard from './lanyard.png';
+
+import * as THREE from 'three';
+import './Lanyard.css';
+
+extend({ MeshLineGeometry, MeshLineMaterial });
+
+export default function Lanyard({ position = [0, 0, 30], gravity = [0, -40, 0], fov = 20, transparent = true }) {
+  const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  return (
+    <div className="lanyard-wrapper">
+      <Canvas
+        camera={{ position: position, fov: fov }}
+        dpr={[1, isMobile ? 1.5 : 2]}
+        gl={{ alpha: transparent }}
+        onCreated={({ gl }) => gl.setClearColor(new THREE.Color(0x000000), transparent ? 0 : 1)}
+      >
+        <ambientLight intensity={Math.PI} />
+        <Physics gravity={gravity} timeStep={isMobile ? 1 / 30 : 1 / 60}>
+          <Band isMobile={isMobile} />
+        </Physics>
+        <Environment blur={0.75}>
+          <Lightformer
+            intensity={2}
+            color="white"
+            position={[0, -1, 5]}
+            rotation={[0, 0, Math.PI / 3]}
+            scale={[100, 0.1, 1]}
+          />
+          <Lightformer
+            intensity={3}
+            color="white"
+            position={[-1, -1, 1]}
+            rotation={[0, 0, Math.PI / 3]}
+            scale={[100, 0.1, 1]}
+          />
+          <Lightformer
+            intensity={3}
+            color="white"
+            position={[1, 1, 1]}
+            rotation={[0, 0, Math.PI / 3]}
+            scale={[100, 0.1, 1]}
+          />
+          <Lightformer
+            intensity={10}
+            color="white"
+            position={[-10, 0, 14]}
+            rotation={[0, Math.PI / 2, Math.PI / 3]}
+            scale={[100, 10, 1]}
+          />
+        </Environment>
+      </Canvas>
+    </div>
+  );
+}
+function Band({ maxSpeed = 50, minSpeed = 0, isMobile = false }) {
+  const band = useRef(),
+    fixed = useRef(),
+    j1 = useRef(),
+    j2 = useRef(),
+    j3 = useRef(),
+    card = useRef();
+  const vec = new THREE.Vector3(),
+    ang = new THREE.Vector3(),
+    rot = new THREE.Vector3(),
+    dir = new THREE.Vector3();
+  const segmentProps = { type: 'dynamic', canSleep: true, colliders: false, angularDamping: 4, linearDamping: 4 };
+  const { nodes, materials } = useGLTF(cardGLB);
+  const texture = useTexture(lanyard);
+  const [curve] = useState(
+    () =>
+      new THREE.CatmullRomCurve3([new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()])
+  );
+  const [dragged, drag] = useState(false);
+  const [hovered, hover] = useState(false);
+
+  useRopeJoint(fixed, j1, [[0, 0, 0], [0, 0, 0], 1]);
+  useRopeJoint(j1, j2, [[0, 0, 0], [0, 0, 0], 1]);
+  useRopeJoint(j2, j3, [[0, 0, 0], [0, 0, 0], 1]);
+  useSphericalJoint(j3, card, [
+    [0, 0, 0],
+    [0, 1.5, 0]
+  ]);
+
+  useEffect(() => {
+    if (hovered) {
+      document.body.style.cursor = dragged ? 'grabbing' : 'grab';
+      return () => void (document.body.style.cursor = 'auto');
+    }
+  }, [hovered, dragged]);
+
+  useFrame((state, delta) => {
+    if (dragged) {
+      vec.set(state.pointer.x, state.pointer.y, 0.5).unproject(state.camera);
+      dir.copy(vec).sub(state.camera.position).normalize();
+      vec.add(dir.multiplyScalar(state.camera.position.length()));
+      [card, j1, j2, j3, fixed].forEach(ref => ref.current?.wakeUp());
+      card.current?.setNextKinematicTranslation({ x: vec.x - dragged.x, y: vec.y - dragged.y, z: vec.z - dragged.z });
+    }
+    if (fixed.current) {
+      [j1, j2].forEach(ref => {
+        if (!ref.current.lerped) ref.current.lerped = new THREE.Vector3().copy(ref.current.translation());
+        const clampedDistance = Math.max(0.1, Math.min(1, ref.current.lerped.distanceTo(ref.current.translation())));
+        ref.current.lerped.lerp(
+          ref.current.translation(),
+          delta * (minSpeed + clampedDistance * (maxSpeed - minSpeed))
+        );
+      });
+      curve.points[0].copy(j3.current.translation());
+      curve.points[1].copy(j2.current.lerped);
+      curve.points[2].copy(j1.current.lerped);
+      curve.points[3].copy(fixed.current.translation());
+      band.current.geometry.setPoints(curve.getPoints(isMobile ? 16 : 32));
+      ang.copy(card.current.angvel());
+      rot.copy(card.current.rotation());
+      card.current.setAngvel({ x: ang.x, y: ang.y - rot.y * 0.25, z: ang.z });
+    }
+  });
+
+  curve.curveType = 'chordal';
+  texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+
+  return (
+    <>
+      <group position={[0, 4, 0]}>
+        <RigidBody ref={fixed} {...segmentProps} type="fixed" />
+        <RigidBody position={[0.5, 0, 0]} ref={j1} {...segmentProps}>
+          <BallCollider args={[0.1]} />
+        </RigidBody>
+        <RigidBody position={[1, 0, 0]} ref={j2} {...segmentProps}>
+          <BallCollider args={[0.1]} />
+        </RigidBody>
+        <RigidBody position={[1.5, 0, 0]} ref={j3} {...segmentProps}>
+          <BallCollider args={[0.1]} />
+        </RigidBody>
+        <RigidBody position={[2, 0, 0]} ref={card} {...segmentProps} type={dragged ? 'kinematicPosition' : 'dynamic'}>
+          <CuboidCollider args={[0.8, 1.125, 0.01]} />
+          <group
+            scale={2.25}
+            position={[0, -1.2, -0.05]}
+            onPointerOver={() => hover(true)}
+            onPointerOut={() => hover(false)}
+            onPointerUp={e => (e.target.releasePointerCapture(e.pointerId), drag(false))}
+            onPointerDown={e => (
+              e.target.setPointerCapture(e.pointerId),
+              drag(new THREE.Vector3().copy(e.point).sub(vec.copy(card.current.translation())))
+            )}
+          >
+            <mesh geometry={nodes.card.geometry}>
+              <meshPhysicalMaterial
+                map={materials.base.map}
+                map-anisotropy={16}
+                clearcoat={isMobile ? 0 : 1}
+                clearcoatRoughness={0.15}
+                roughness={0.9}
+                metalness={0.8}
+              />
+            </mesh>
+            <mesh geometry={nodes.clip.geometry} material={materials.metal} material-roughness={0.3} />
+            <mesh geometry={nodes.clamp.geometry} material={materials.metal} />
+          </group>
+        </RigidBody>
+      </group>
+      <mesh ref={band}>
+        <meshLineGeometry />
+        <meshLineMaterial
+          color="white"
+          depthTest={false}
+          resolution={isMobile ? [1000, 2000] : [1000, 1000]}
+          useMap
+          map={texture}
+          repeat={[-4, 1]}
+          lineWidth={1}
+        />
+      </mesh>
+    </>
+  );
+}
+
+CSS :
+.lanyard-wrapper {
+  position: relative;
+  z-index: 0;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transform: scale(1);
+  transform-origin: center;
+}
+
+4.	Border Glow
+CLI = npx shadcn@latest add @react-bits/BorderGlow-JS-CSS
+Usage = 
+import BorderGlow from './BorderGlow';
+
+<BorderGlow
+  edgeSensitivity={30}
+  glowColor="40 80 80"
+  backgroundColor="#120F17"
+  borderRadius={28}
+  glowRadius={40}
+  glowIntensity={1}
+  coneSpread={25}
+  animated={false}
+  colors={['#c084fc', '#f472b6', '#38bdf8']}
+>
+  <div style={{ padding: '2em' }}>
+    <h2>Your Content Here</h2>
+    <p>Hover near the edges to see the glow.</p>
+  </div>
+</BorderGlow>
+
+Code :
+import { useRef, useCallback, useEffect } from 'react';
+import './BorderGlow.css';
+
+function parseHSL(hslStr) {
+  const match = hslStr.match(/([\d.]+)\s*([\d.]+)%?\s*([\d.]+)%?/);
+  if (!match) return { h: 40, s: 80, l: 80 };
+  return { h: parseFloat(match[1]), s: parseFloat(match[2]), l: parseFloat(match[3]) };
+}
+
+function buildGlowVars(glowColor, intensity) {
+  const { h, s, l } = parseHSL(glowColor);
+  const base = `${h}deg ${s}% ${l}%`;
+  const opacities = [100, 60, 50, 40, 30, 20, 10];
+  const keys = ['', '-60', '-50', '-40', '-30', '-20', '-10'];
+  const vars = {};
+  for (let i = 0; i < opacities.length; i++) {
+    vars[`--glow-color${keys[i]}`] = `hsl(${base} / ${Math.min(opacities[i] * intensity, 100)}%)`;
+  }
+  return vars;
+}
+
+const GRADIENT_POSITIONS = ['80% 55%', '69% 34%', '8% 6%', '41% 38%', '86% 85%', '82% 18%', '51% 4%'];
+const GRADIENT_KEYS = ['--gradient-one', '--gradient-two', '--gradient-three', '--gradient-four', '--gradient-five', '--gradient-six', '--gradient-seven'];
+const COLOR_MAP = [0, 1, 2, 0, 1, 2, 1];
+
+function buildGradientVars(colors) {
+  const vars = {};
+  for (let i = 0; i < 7; i++) {
+    const c = colors[Math.min(COLOR_MAP[i], colors.length - 1)];
+    vars[GRADIENT_KEYS[i]] = `radial-gradient(at ${GRADIENT_POSITIONS[i]}, ${c} 0px, transparent 50%)`;
+  }
+  vars['--gradient-base'] = `linear-gradient(${colors[0]} 0 100%)`;
+  return vars;
+}
+
+function easeOutCubic(x) { return 1 - Math.pow(1 - x, 3); }
+function easeInCubic(x) { return x * x * x; }
+
+function animateValue({ start = 0, end = 100, duration = 1000, delay = 0, ease = easeOutCubic, onUpdate, onEnd }) {
+  const t0 = performance.now() + delay;
+  function tick() {
+    const elapsed = performance.now() - t0;
+    const t = Math.min(elapsed / duration, 1);
+    onUpdate(start + (end - start) * ease(t));
+    if (t < 1) requestAnimationFrame(tick);
+    else if (onEnd) onEnd();
+  }
+  setTimeout(() => requestAnimationFrame(tick), delay);
+}
+
+const BorderGlow = ({
+  children,
+  className = '',
+  edgeSensitivity = 30,
+  glowColor = '40 80 80',
+  backgroundColor = '#120F17',
+  borderRadius = 28,
+  glowRadius = 40,
+  glowIntensity = 1.0,
+  coneSpread = 25,
+  animated = false,
+  colors = ['#c084fc', '#f472b6', '#38bdf8'],
+  fillOpacity = 0.5,
+}) => {
+  const cardRef = useRef(null);
+
+  const getCenterOfElement = useCallback((el) => {
+    const { width, height } = el.getBoundingClientRect();
+    return [width / 2, height / 2];
+  }, []);
+
+  const getEdgeProximity = useCallback((el, x, y) => {
+    const [cx, cy] = getCenterOfElement(el);
+    const dx = x - cx;
+    const dy = y - cy;
+    let kx = Infinity;
+    let ky = Infinity;
+    if (dx !== 0) kx = cx / Math.abs(dx);
+    if (dy !== 0) ky = cy / Math.abs(dy);
+    return Math.min(Math.max(1 / Math.min(kx, ky), 0), 1);
+  }, [getCenterOfElement]);
+
+  const getCursorAngle = useCallback((el, x, y) => {
+    const [cx, cy] = getCenterOfElement(el);
+    const dx = x - cx;
+    const dy = y - cy;
+    if (dx === 0 && dy === 0) return 0;
+    const radians = Math.atan2(dy, dx);
+    let degrees = radians * (180 / Math.PI) + 90;
+    if (degrees < 0) degrees += 360;
+    return degrees;
+  }, [getCenterOfElement]);
+
+  const handlePointerMove = useCallback((e) => {
+    const card = cardRef.current;
+    if (!card) return;
+
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    const edge = getEdgeProximity(card, x, y);
+    const angle = getCursorAngle(card, x, y);
+
+    card.style.setProperty('--edge-proximity', `${(edge * 100).toFixed(3)}`);
+    card.style.setProperty('--cursor-angle', `${angle.toFixed(3)}deg`);
+  }, [getEdgeProximity, getCursorAngle]);
+
+  useEffect(() => {
+    if (!animated || !cardRef.current) return;
+    const card = cardRef.current;
+    const angleStart = 110;
+    const angleEnd = 465;
+    card.classList.add('sweep-active');
+    card.style.setProperty('--cursor-angle', `${angleStart}deg`);
+
+    animateValue({ duration: 500, onUpdate: v => card.style.setProperty('--edge-proximity', v) });
+    animateValue({ ease: easeInCubic, duration: 1500, end: 50, onUpdate: v => {
+      card.style.setProperty('--cursor-angle', `${(angleEnd - angleStart) * (v / 100) + angleStart}deg`);
+    }});
+    animateValue({ ease: easeOutCubic, delay: 1500, duration: 2250, start: 50, end: 100, onUpdate: v => {
+      card.style.setProperty('--cursor-angle', `${(angleEnd - angleStart) * (v / 100) + angleStart}deg`);
+    }});
+    animateValue({ ease: easeInCubic, delay: 2500, duration: 1500, start: 100, end: 0,
+      onUpdate: v => card.style.setProperty('--edge-proximity', v),
+      onEnd: () => card.classList.remove('sweep-active'),
+    });
+  }, [animated]);
+
+  const glowVars = buildGlowVars(glowColor, glowIntensity);
+
+  return (
+    <div
+      ref={cardRef}
+      onPointerMove={handlePointerMove}
+      className={`border-glow-card ${className}`}
+      style={{
+        '--card-bg': backgroundColor,
+        '--edge-sensitivity': edgeSensitivity,
+        '--border-radius': `${borderRadius}px`,
+        '--glow-padding': `${glowRadius}px`,
+        '--cone-spread': coneSpread,
+        '--fill-opacity': fillOpacity,
+        ...glowVars,
+        ...buildGradientVars(colors),
+      }}
+    >
+      <span className="edge-light" />
+      <div className="border-glow-inner">
+        {children}
+      </div>
+    </div>
+  );
+};
+
+export default BorderGlow;
+CSS:
+.border-glow-card {
+  --edge-proximity: 0;
+  --cursor-angle: 45deg;
+  --edge-sensitivity: 30;
+  --color-sensitivity: calc(var(--edge-sensitivity) + 20);
+  --border-radius: 28px;
+  --glow-padding: 40px;
+  --cone-spread: 25;
+
+  position: relative;
+  border-radius: var(--border-radius);
+  isolation: isolate;
+  transform: translate3d(0, 0, 0.01px);
+  display: grid;
+  border: 1px solid rgb(255 255 255 / 15%);
+  background: var(--card-bg, #120F17);
+  overflow: visible;
+  box-shadow:
+    rgba(0, 0, 0, 0.1) 0px 1px 2px,
+    rgba(0, 0, 0, 0.1) 0px 2px 4px,
+    rgba(0, 0, 0, 0.1) 0px 4px 8px,
+    rgba(0, 0, 0, 0.1) 0px 8px 16px,
+    rgba(0, 0, 0, 0.1) 0px 16px 32px,
+    rgba(0, 0, 0, 0.1) 0px 32px 64px;
+}
+
+.border-glow-card::before,
+.border-glow-card::after,
+.border-glow-card > .edge-light {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  transition: opacity 0.25s ease-out;
+  z-index: -1;
+}
+
+.border-glow-card:not(:hover):not(.sweep-active)::before,
+.border-glow-card:not(:hover):not(.sweep-active)::after,
+.border-glow-card:not(:hover):not(.sweep-active) > .edge-light {
+  opacity: 0;
+  transition: opacity 0.75s ease-in-out;
+}
+
+/* colored mesh-gradient border */
+.border-glow-card::before {
+  border: 1px solid transparent;
+  background:
+    linear-gradient(var(--card-bg, #120F17) 0 100%) padding-box,
+    linear-gradient(rgb(255 255 255 / 0%) 0% 100%) border-box,
+    var(--gradient-one, radial-gradient(at 80% 55%, hsla(268, 100%, 76%, 1) 0px, transparent 50%)) border-box,
+    var(--gradient-two, radial-gradient(at 69% 34%, hsla(349, 100%, 74%, 1) 0px, transparent 50%)) border-box,
+    var(--gradient-three, radial-gradient(at 8% 6%, hsla(136, 100%, 78%, 1) 0px, transparent 50%)) border-box,
+    var(--gradient-four, radial-gradient(at 41% 38%, hsla(192, 100%, 64%, 1) 0px, transparent 50%)) border-box,
+    var(--gradient-five, radial-gradient(at 86% 85%, hsla(186, 100%, 74%, 1) 0px, transparent 50%)) border-box,
+    var(--gradient-six, radial-gradient(at 82% 18%, hsla(52, 100%, 65%, 1) 0px, transparent 50%)) border-box,
+    var(--gradient-seven, radial-gradient(at 51% 4%, hsla(12, 100%, 72%, 1) 0px, transparent 50%)) border-box,
+    var(--gradient-base, linear-gradient(#c299ff 0 100%)) border-box;
+
+  opacity: calc((var(--edge-proximity) - var(--color-sensitivity)) / (100 - var(--color-sensitivity)));
+
+  mask-image:
+    conic-gradient(
+      from var(--cursor-angle) at center,
+      black calc(var(--cone-spread) * 1%),
+      transparent calc((var(--cone-spread) + 15) * 1%),
+      transparent calc((100 - var(--cone-spread) - 15) * 1%),
+      black calc((100 - var(--cone-spread)) * 1%)
+    );
+}
+
+/* colored mesh-gradient background fill near edges */
+.border-glow-card::after {
+  border: 1px solid transparent;
+  background:
+    var(--gradient-one, radial-gradient(at 80% 55%, hsla(268, 100%, 76%, 1) 0px, transparent 50%)) padding-box,
+    var(--gradient-two, radial-gradient(at 69% 34%, hsla(349, 100%, 74%, 1) 0px, transparent 50%)) padding-box,
+    var(--gradient-three, radial-gradient(at 8% 6%, hsla(136, 100%, 78%, 1) 0px, transparent 50%)) padding-box,
+    var(--gradient-four, radial-gradient(at 41% 38%, hsla(192, 100%, 64%, 1) 0px, transparent 50%)) padding-box,
+    var(--gradient-five, radial-gradient(at 86% 85%, hsla(186, 100%, 74%, 1) 0px, transparent 50%)) padding-box,
+    var(--gradient-six, radial-gradient(at 82% 18%, hsla(52, 100%, 65%, 1) 0px, transparent 50%)) padding-box,
+    var(--gradient-seven, radial-gradient(at 51% 4%, hsla(12, 100%, 72%, 1) 0px, transparent 50%)) padding-box,
+    var(--gradient-base, linear-gradient(#c299ff 0 100%)) padding-box;
+
+  mask-image:
+    linear-gradient(to bottom, black, black),
+    radial-gradient(ellipse at 50% 50%, black 40%, transparent 65%),
+    radial-gradient(ellipse at 66% 66%, black 5%, transparent 40%),
+    radial-gradient(ellipse at 33% 33%, black 5%, transparent 40%),
+    radial-gradient(ellipse at 66% 33%, black 5%, transparent 40%),
+    radial-gradient(ellipse at 33% 66%, black 5%, transparent 40%),
+    conic-gradient(from var(--cursor-angle) at center, transparent 5%, black 15%, black 85%, transparent 95%);
+
+  mask-composite: subtract, add, add, add, add, add;
+  opacity: calc(var(--fill-opacity, 0.5) * (var(--edge-proximity) - var(--color-sensitivity)) / (100 - var(--color-sensitivity)));
+  mix-blend-mode: soft-light;
+}
+
+/* outer glow layer */
+.border-glow-card > .edge-light {
+  inset: calc(var(--glow-padding) * -1);
+  pointer-events: none;
+  z-index: 1;
+
+  mask-image:
+    conic-gradient(
+      from var(--cursor-angle) at center, black 2.5%, transparent 10%, transparent 90%, black 97.5%
+    );
+
+  opacity: calc((var(--edge-proximity) - var(--edge-sensitivity)) / (100 - var(--edge-sensitivity)));
+  mix-blend-mode: plus-lighter;
+}
+
+.border-glow-card > .edge-light::before {
+  content: "";
+  position: absolute;
+  inset: var(--glow-padding);
+  border-radius: inherit;
+  box-shadow:
+    inset 0 0 0 1px var(--glow-color, hsl(40deg 80% 80% / 100%)),
+    inset 0 0 1px 0 var(--glow-color-60, hsl(40deg 80% 80% / 60%)),
+    inset 0 0 3px 0 var(--glow-color-50, hsl(40deg 80% 80% / 50%)),
+    inset 0 0 6px 0 var(--glow-color-40, hsl(40deg 80% 80% / 40%)),
+    inset 0 0 15px 0 var(--glow-color-30, hsl(40deg 80% 80% / 30%)),
+    inset 0 0 25px 2px var(--glow-color-20, hsl(40deg 80% 80% / 20%)),
+    inset 0 0 50px 2px var(--glow-color-10, hsl(40deg 80% 80% / 10%)),
+    0 0 1px 0 var(--glow-color-60, hsl(40deg 80% 80% / 60%)),
+    0 0 3px 0 var(--glow-color-50, hsl(40deg 80% 80% / 50%)),
+    0 0 6px 0 var(--glow-color-40, hsl(40deg 80% 80% / 40%)),
+    0 0 15px 0 var(--glow-color-30, hsl(40deg 80% 80% / 30%)),
+    0 0 25px 2px var(--glow-color-20, hsl(40deg 80% 80% / 20%)),
+    0 0 50px 2px var(--glow-color-10, hsl(40deg 80% 80% / 10%));
+}
+
+.border-glow-inner {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: auto;
+  z-index: 1;
+}
+
+
+D.	Backgrounds Documentations
+1.	Shape Grid	
+CLI : npx shadcn@latest add @react-bits/ShapeGrid-JS-CSS
+Usage :
+import ShapeGrid from './ShapeGrid';
+  
+<ShapeGrid 
+speed={0.5}
+squareSize={40}
+direction='diagonal' // up, down, left, right, diagonal
+borderColor="#2F293A"
+hoverFillColor='#222'
+shape='square' // square, hexagon, circle, triangle
+hoverTrailAmount={0} // number of trailing hovered shapes (0 = no trail)
+  direction="diagonal"
+  hoverColor="#222222"
+  size={40}
+  shape="square"
+/>
+
+Code:
+import { useRef, useEffect } from 'react';
+import './ShapeGrid.css';
+
+const ShapeGrid = ({
+  direction = 'right',
+  speed = 1,
+  borderColor = '#999',
+  squareSize = 40,
+  hoverFillColor = '#222',
+  shape = 'square',
+  hoverTrailAmount = 0,
+  className = ''
+}) => {
+  const canvasRef = useRef(null);
+  const requestRef = useRef(null);
+  const numSquaresX = useRef();
+  const numSquaresY = useRef();
+  const gridOffset = useRef({ x: 0, y: 0 });
+  const hoveredSquare = useRef(null);
+  const trailCells = useRef([]);
+  const cellOpacities = useRef(new Map());
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+
+    const isHex = shape === 'hexagon';
+    const isTri = shape === 'triangle';
+    const hexHoriz = squareSize * 1.5;
+    const hexVert = squareSize * Math.sqrt(3);
+
+    const resizeCanvas = () => {
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+      numSquaresX.current = Math.ceil(canvas.width / squareSize) + 1;
+      numSquaresY.current = Math.ceil(canvas.height / squareSize) + 1;
+    };
+
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    const drawHex = (cx, cy, size) => {
+      ctx.beginPath();
+      for (let i = 0; i < 6; i++) {
+        const angle = (Math.PI / 3) * i;
+        const vx = cx + size * Math.cos(angle);
+        const vy = cy + size * Math.sin(angle);
+        if (i === 0) ctx.moveTo(vx, vy);
+        else ctx.lineTo(vx, vy);
+      }
+      ctx.closePath();
+    };
+
+    const drawCircle = (cx, cy, size) => {
+      ctx.beginPath();
+      ctx.arc(cx, cy, size / 2, 0, Math.PI * 2);
+      ctx.closePath();
+    };
+
+    const drawTriangle = (cx, cy, size, flip) => {
+      ctx.beginPath();
+      if (flip) {
+        ctx.moveTo(cx, cy + size / 2);
+        ctx.lineTo(cx + size / 2, cy - size / 2);
+        ctx.lineTo(cx - size / 2, cy - size / 2);
+      } else {
+        ctx.moveTo(cx, cy - size / 2);
+        ctx.lineTo(cx + size / 2, cy + size / 2);
+        ctx.lineTo(cx - size / 2, cy + size / 2);
+      }
+      ctx.closePath();
+    };
+
+    const drawGrid = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      if (isHex) {
+        const colShift = Math.floor(gridOffset.current.x / hexHoriz);
+        const offsetX = ((gridOffset.current.x % hexHoriz) + hexHoriz) % hexHoriz;
+        const offsetY = ((gridOffset.current.y % hexVert) + hexVert) % hexVert;
+
+        const cols = Math.ceil(canvas.width / hexHoriz) + 3;
+        const rows = Math.ceil(canvas.height / hexVert) + 3;
+
+        for (let col = -2; col < cols; col++) {
+          for (let row = -2; row < rows; row++) {
+            const cx = col * hexHoriz + offsetX;
+            const cy = row * hexVert + ((col + colShift) % 2 !== 0 ? hexVert / 2 : 0) + offsetY;
+
+            const cellKey = `${col},${row}`;
+            const alpha = cellOpacities.current.get(cellKey);
+            if (alpha) {
+              ctx.globalAlpha = alpha;
+              drawHex(cx, cy, squareSize);
+              ctx.fillStyle = hoverFillColor;
+              ctx.fill();
+              ctx.globalAlpha = 1;
+            }
+
+            drawHex(cx, cy, squareSize);
+            ctx.strokeStyle = borderColor;
+            ctx.stroke();
+          }
+        }
+      } else if (isTri) {
+        const halfW = squareSize / 2;
+        const colShift = Math.floor(gridOffset.current.x / halfW);
+        const rowShift = Math.floor(gridOffset.current.y / squareSize);
+        const offsetX = ((gridOffset.current.x % halfW) + halfW) % halfW;
+        const offsetY = ((gridOffset.current.y % squareSize) + squareSize) % squareSize;
+
+        const cols = Math.ceil(canvas.width / halfW) + 4;
+        const rows = Math.ceil(canvas.height / squareSize) + 4;
+
+        for (let col = -2; col < cols; col++) {
+          for (let row = -2; row < rows; row++) {
+            const cx = col * halfW + offsetX;
+            const cy = row * squareSize + squareSize / 2 + offsetY;
+            const flip = ((col + colShift + row + rowShift) % 2 + 2) % 2 !== 0;
+
+            const cellKey = `${col},${row}`;
+            const alpha = cellOpacities.current.get(cellKey);
+            if (alpha) {
+              ctx.globalAlpha = alpha;
+              drawTriangle(cx, cy, squareSize, flip);
+              ctx.fillStyle = hoverFillColor;
+              ctx.fill();
+              ctx.globalAlpha = 1;
+            }
+
+            drawTriangle(cx, cy, squareSize, flip);
+            ctx.strokeStyle = borderColor;
+            ctx.stroke();
+          }
+        }
+      } else if (shape === 'circle') {
+        const offsetX = ((gridOffset.current.x % squareSize) + squareSize) % squareSize;
+        const offsetY = ((gridOffset.current.y % squareSize) + squareSize) % squareSize;
+
+        const cols = Math.ceil(canvas.width / squareSize) + 3;
+        const rows = Math.ceil(canvas.height / squareSize) + 3;
+
+        for (let col = -2; col < cols; col++) {
+          for (let row = -2; row < rows; row++) {
+            const cx = col * squareSize + squareSize / 2 + offsetX;
+            const cy = row * squareSize + squareSize / 2 + offsetY;
+
+            const cellKey = `${col},${row}`;
+            const alpha = cellOpacities.current.get(cellKey);
+            if (alpha) {
+              ctx.globalAlpha = alpha;
+              drawCircle(cx, cy, squareSize);
+              ctx.fillStyle = hoverFillColor;
+              ctx.fill();
+              ctx.globalAlpha = 1;
+            }
+
+            drawCircle(cx, cy, squareSize);
+            ctx.strokeStyle = borderColor;
+            ctx.stroke();
+          }
+        }
+      } else {
+        const offsetX = ((gridOffset.current.x % squareSize) + squareSize) % squareSize;
+        const offsetY = ((gridOffset.current.y % squareSize) + squareSize) % squareSize;
+
+        const cols = Math.ceil(canvas.width / squareSize) + 3;
+        const rows = Math.ceil(canvas.height / squareSize) + 3;
+
+        for (let col = -2; col < cols; col++) {
+          for (let row = -2; row < rows; row++) {
+            const sx = col * squareSize + offsetX;
+            const sy = row * squareSize + offsetY;
+
+            const cellKey = `${col},${row}`;
+            const alpha = cellOpacities.current.get(cellKey);
+            if (alpha) {
+              ctx.globalAlpha = alpha;
+              ctx.fillStyle = hoverFillColor;
+              ctx.fillRect(sx, sy, squareSize, squareSize);
+              ctx.globalAlpha = 1;
+            }
+
+            ctx.strokeStyle = borderColor;
+            ctx.strokeRect(sx, sy, squareSize, squareSize);
+          }
+        }
+      }
+
+      const gradient = ctx.createRadialGradient(
+        canvas.width / 2,
+        canvas.height / 2,
+        0,
+        canvas.width / 2,
+        canvas.height / 2,
+        Math.sqrt(canvas.width ** 2 + canvas.height ** 2) / 2
+      );
+      gradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
+
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    };
+
+    const updateAnimation = () => {
+      const effectiveSpeed = Math.max(speed, 0.1);
+      const wrapX = isHex ? hexHoriz * 2 : squareSize;
+      const wrapY = isHex ? hexVert : isTri ? squareSize * 2 : squareSize;
+
+      switch (direction) {
+        case 'right':
+          gridOffset.current.x = (gridOffset.current.x - effectiveSpeed + wrapX) % wrapX;
+          break;
+        case 'left':
+          gridOffset.current.x = (gridOffset.current.x + effectiveSpeed + wrapX) % wrapX;
+          break;
+        case 'up':
+          gridOffset.current.y = (gridOffset.current.y + effectiveSpeed + wrapY) % wrapY;
+          break;
+        case 'down':
+          gridOffset.current.y = (gridOffset.current.y - effectiveSpeed + wrapY) % wrapY;
+          break;
+        case 'diagonal':
+          gridOffset.current.x = (gridOffset.current.x - effectiveSpeed + wrapX) % wrapX;
+          gridOffset.current.y = (gridOffset.current.y - effectiveSpeed + wrapY) % wrapY;
+          break;
+        default:
+          break;
+      }
+
+      updateCellOpacities();
+      drawGrid();
+      requestRef.current = requestAnimationFrame(updateAnimation);
+    };
+
+    const updateCellOpacities = () => {
+      const targets = new Map();
+
+      if (hoveredSquare.current) {
+        targets.set(`${hoveredSquare.current.x},${hoveredSquare.current.y}`, 1);
+      }
+
+      if (hoverTrailAmount > 0) {
+        for (let i = 0; i < trailCells.current.length; i++) {
+          const t = trailCells.current[i];
+          const key = `${t.x},${t.y}`;
+          if (!targets.has(key)) {
+            targets.set(key, (trailCells.current.length - i) / (trailCells.current.length + 1));
+          }
+        }
+      }
+
+      for (const [key] of targets) {
+        if (!cellOpacities.current.has(key)) {
+          cellOpacities.current.set(key, 0);
+        }
+      }
+
+      for (const [key, opacity] of cellOpacities.current) {
+        const target = targets.get(key) || 0;
+        const next = opacity + (target - opacity) * 0.15;
+        if (next < 0.005) {
+          cellOpacities.current.delete(key);
+        } else {
+          cellOpacities.current.set(key, next);
+        }
+      }
+    };
+
+    const handleMouseMove = event => {
+      const rect = canvas.getBoundingClientRect();
+      const mouseX = event.clientX - rect.left;
+      const mouseY = event.clientY - rect.top;
+
+      if (isHex) {
+        const colShift = Math.floor(gridOffset.current.x / hexHoriz);
+        const offsetX = ((gridOffset.current.x % hexHoriz) + hexHoriz) % hexHoriz;
+        const offsetY = ((gridOffset.current.y % hexVert) + hexVert) % hexVert;
+        const adjustedX = mouseX - offsetX;
+        const adjustedY = mouseY - offsetY;
+
+        const col = Math.round(adjustedX / hexHoriz);
+        const rowOffset = (col + colShift) % 2 !== 0 ? hexVert / 2 : 0;
+        const row = Math.round((adjustedY - rowOffset) / hexVert);
+
+        if (
+          !hoveredSquare.current ||
+          hoveredSquare.current.x !== col ||
+          hoveredSquare.current.y !== row
+        ) {
+          if (hoveredSquare.current && hoverTrailAmount > 0) {
+            trailCells.current.unshift({ ...hoveredSquare.current });
+            if (trailCells.current.length > hoverTrailAmount) trailCells.current.length = hoverTrailAmount;
+          }
+          hoveredSquare.current = { x: col, y: row };
+        }
+      } else if (isTri) {
+        const halfW = squareSize / 2;
+        const offsetX = ((gridOffset.current.x % halfW) + halfW) % halfW;
+        const offsetY = ((gridOffset.current.y % squareSize) + squareSize) % squareSize;
+
+        const adjustedX = mouseX - offsetX;
+        const adjustedY = mouseY - offsetY;
+
+        const col = Math.round(adjustedX / halfW);
+        const row = Math.floor(adjustedY / squareSize);
+
+        if (
+          !hoveredSquare.current ||
+          hoveredSquare.current.x !== col ||
+          hoveredSquare.current.y !== row
+        ) {
+          if (hoveredSquare.current && hoverTrailAmount > 0) {
+            trailCells.current.unshift({ ...hoveredSquare.current });
+            if (trailCells.current.length > hoverTrailAmount) trailCells.current.length = hoverTrailAmount;
+          }
+          hoveredSquare.current = { x: col, y: row };
+        }
+      } else if (shape === 'circle') {
+        const offsetX = ((gridOffset.current.x % squareSize) + squareSize) % squareSize;
+        const offsetY = ((gridOffset.current.y % squareSize) + squareSize) % squareSize;
+
+        const adjustedX = mouseX - offsetX;
+        const adjustedY = mouseY - offsetY;
+
+        const col = Math.round(adjustedX / squareSize);
+        const row = Math.round(adjustedY / squareSize);
+
+        if (
+          !hoveredSquare.current ||
+          hoveredSquare.current.x !== col ||
+          hoveredSquare.current.y !== row
+        ) {
+          if (hoveredSquare.current && hoverTrailAmount > 0) {
+            trailCells.current.unshift({ ...hoveredSquare.current });
+            if (trailCells.current.length > hoverTrailAmount) trailCells.current.length = hoverTrailAmount;
+          }
+          hoveredSquare.current = { x: col, y: row };
+        }
+      } else {
+        const offsetX = ((gridOffset.current.x % squareSize) + squareSize) % squareSize;
+        const offsetY = ((gridOffset.current.y % squareSize) + squareSize) % squareSize;
+
+        const adjustedX = mouseX - offsetX;
+        const adjustedY = mouseY - offsetY;
+
+        const col = Math.floor(adjustedX / squareSize);
+        const row = Math.floor(adjustedY / squareSize);
+
+        if (
+          !hoveredSquare.current ||
+          hoveredSquare.current.x !== col ||
+          hoveredSquare.current.y !== row
+        ) {
+          if (hoveredSquare.current && hoverTrailAmount > 0) {
+            trailCells.current.unshift({ ...hoveredSquare.current });
+            if (trailCells.current.length > hoverTrailAmount) trailCells.current.length = hoverTrailAmount;
+          }
+          hoveredSquare.current = { x: col, y: row };
+        }
+      }
+    };
+
+    const handleMouseLeave = () => {
+      if (hoveredSquare.current && hoverTrailAmount > 0) {
+        trailCells.current.unshift({ ...hoveredSquare.current });
+        if (trailCells.current.length > hoverTrailAmount) trailCells.current.length = hoverTrailAmount;
+      }
+      hoveredSquare.current = null;
+    };
+
+    canvas.addEventListener('mousemove', handleMouseMove);
+    canvas.addEventListener('mouseleave', handleMouseLeave);
+
+    requestRef.current = requestAnimationFrame(updateAnimation);
+
+    return () => {
+      window.removeEventListener('resize', resizeCanvas);
+      cancelAnimationFrame(requestRef.current);
+      canvas.removeEventListener('mousemove', handleMouseMove);
+      canvas.removeEventListener('mouseleave', handleMouseLeave);
+    };
+  }, [direction, speed, borderColor, hoverFillColor, squareSize, shape, hoverTrailAmount]);
+
+  return <canvas ref={canvasRef} className={`shapegrid-canvas ${className}`}></canvas>;
+};
+
+export default ShapeGrid;
+
+CSS :
+.shapegrid-canvas {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+}
+
