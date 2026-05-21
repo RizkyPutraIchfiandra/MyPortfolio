@@ -286,7 +286,7 @@ function Index() {
             </motion.div>
 
             <p className="font-mono text-xs text-[#a3a3a3] mb-6 tracking-widest">
-              // BASED IN CIBINONG, ID
+              // BASED IN CILEUNGSI, ID
             </p>
             <h1 className="text-5xl md:text-7xl font-bold leading-[1.05] tracking-tight">
               <BlurText text="Crafting digital" />
@@ -415,7 +415,7 @@ function Index() {
                     ID / GMT+7
                   </div>
                   <div className="absolute bottom-5 left-5 font-mono text-[10px] text-foreground/55 tracking-widest uppercase">
-                    Cibinong, Bogor
+                    Cileungsi, Bogor
                   </div>
                   <div className="absolute bottom-5 right-5 font-mono text-[10px] text-foreground tracking-widest uppercase flex items-center gap-1.5">
                     <span className="relative flex h-1.5 w-1.5">
@@ -461,7 +461,7 @@ function Index() {
                   .
                   <br />
                   <span className="text-foreground/55">
-                    A creative developer based in Cibinong.
+                    A creative developer based in Cileungsi.
                   </span>
                 </h2>
               </ScrollReveal>
@@ -905,7 +905,7 @@ function Index() {
                         <div className="text-xs font-mono text-muted-foreground uppercase tracking-wider">
                           Based in
                         </div>
-                        <div className="text-sm md:text-base truncate">Cibinong, Bogor — ID</div>
+                        <div className="text-sm md:text-base truncate">Harvest City Cileungsi — ID</div>
                       </div>
                     </div>
                     <span className="text-xs font-mono text-muted-foreground shrink-0">GMT+7</span>
@@ -914,8 +914,8 @@ function Index() {
                   {/* map */}
                   <div className="relative h-56 md:h-64 w-full">
                     <iframe
-                      title="Andra's location — Cibinong, Indonesia"
-                      src="https://www.google.com/maps?q=Cibinong,Bogor,Indonesia&z=13&output=embed"
+                      title="Andra's location — Harvest City Cileungsi, Indonesia"
+                      src="https://www.google.com/maps?q=Harvest+City+Cileungsi+Sweet+Hortensia&z=15&output=embed"
                       loading="lazy"
                       referrerPolicy="no-referrer-when-downgrade"
                       className="absolute inset-0 w-full h-full border-0"
@@ -930,7 +930,7 @@ function Index() {
 
                     {/* open in maps */}
                     <a
-                      href="https://www.google.com/maps/search/?api=1&query=Cibinong,Bogor,Indonesia"
+                      href="https://www.google.com/maps/search/?api=1&query=Harvest+City+Cileungsi+Sweet+Hortensia"
                       target="_blank"
                       rel="noreferrer"
                       className="absolute bottom-3 right-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#0a0a0a]/90 border border-white/15 text-xs font-mono text-[#a3a3a3] hover:border-[#a3a3a3]/60 hover:text-[#a3a3a3] transition backdrop-blur-md"
