@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Suspense } from "react";
 import { motion } from "framer-motion";
 import {
   ArrowUpRight,
@@ -15,7 +14,7 @@ import {
   GraduationCap,
 } from "lucide-react";
 import ShapeGrid from "@/components/effects/ShapeGrid.jsx";
-import { Lanyard } from "@/components/effects/Lanyard";
+import { PhotoCard } from "@/components/PhotoCard";
 import { BlurText } from "@/components/effects/BlurText";
 import RotatingText from "@/components/effects/RotatingText";
 import { ScrollVelocity } from "@/components/effects/ScrollVelocity";
@@ -348,15 +347,7 @@ function Index() {
           </div>
 
           <div className="relative">
-            <Suspense
-              fallback={
-                <div className="w-full h-[600px] md:h-[700px] flex items-center justify-center text-muted-foreground">
-                  Loading 3D...
-                </div>
-              }
-            >
-              <Lanyard />
-            </Suspense>
+            <PhotoCard />
           </div>
 
           <motion.a
