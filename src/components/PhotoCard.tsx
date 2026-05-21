@@ -2,16 +2,16 @@ import { motion } from "framer-motion";
 
 export function PhotoCard() {
   return (
-    <div className="w-full h-[600px] md:h-[700px] flex items-center justify-center">
+    <div className="w-full h-[480px] sm:h-[560px] md:h-[640px] lg:h-[700px] flex items-center justify-center">
       <motion.div
         initial={{ opacity: 0, y: 30, rotate: -3 }}
         animate={{ opacity: 1, y: 0, rotate: -3 }}
         whileHover={{ rotate: 0, y: -8, scale: 1.02 }}
         transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
-        className="relative w-[300px] md:w-[380px]"
+        className="relative w-[260px] sm:w-[300px] md:w-[340px] lg:w-[380px] max-w-[80%]"
       >
         {/* lanyard string */}
-        <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-px h-32 bg-gradient-to-b from-transparent via-white/20 to-white/40" />
+        <div className="absolute -top-20 sm:-top-32 left-1/2 -translate-x-1/2 w-px h-20 sm:h-32 bg-gradient-to-b from-transparent via-white/20 to-white/40" />
         <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-12 h-3 rounded-t-full bg-gradient-to-b from-[#262626] to-[#171717] border border-white/10" />
 
         {/* card */}

@@ -32,6 +32,7 @@ import { ProjectGallery } from "@/components/ProjectGallery";
 import { ScrollReveal } from "@/components/effects/ScrollReveal";
 import { ShinyText } from "@/components/effects/ShinyText";
 import { ContactForm } from "@/components/ContactForm";
+import { MobileNav } from "@/components/MobileNav";
 import Footer from "@/components/Footer";
 
 export const Route = createFileRoute("/")({
@@ -243,15 +244,15 @@ function Index() {
       <div className="relative z-10">
         {/* NAV */}
         <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-[#0a0a0a]/80 border-b border-white/10">
-          <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center">
             <a
               href="#top"
-              className="flex items-center gap-2 font-mono text-sm tracking-widest text-[#fafafa]"
+              className="flex items-center gap-2 font-mono text-xs sm:text-sm tracking-widest text-[#fafafa]"
             >
               <span className="w-2 h-2 rounded-full bg-[#fafafa] shadow-[0_0_10px_#fafafa]" />
               ANDRA.DEV
             </a>
-            <div className="hidden md:flex gap-8 text-sm font-mono">
+            <div className="hidden md:flex gap-6 lg:gap-8 text-sm font-mono">
               <a href="#about" className="hover:text-[#fafafa] transition">
                 About
               </a>
@@ -275,13 +276,14 @@ function Index() {
               Start a Project
               <ArrowUpRight className="w-3.5 h-3.5" />
             </a>
+            <MobileNav />
           </div>
         </nav>
 
         {/* HERO */}
         <section
           id="top"
-          className="relative pt-32 pb-16 min-h-screen grid md:grid-cols-2 gap-8 max-w-7xl mx-auto px-6 items-center"
+          className="relative pt-24 sm:pt-28 md:pt-32 pb-16 md:min-h-screen grid md:grid-cols-2 gap-8 md:gap-12 max-w-7xl mx-auto px-4 sm:px-6 items-center"
         >
           <div className="z-10">
             <motion.div
@@ -300,7 +302,7 @@ function Index() {
             <p className="font-mono text-xs text-[#a3a3a3] mb-6 tracking-widest">
               // BASED IN CILEUNGSI, ID
             </p>
-            <h1 className="text-5xl md:text-7xl font-bold leading-[1.05] tracking-tight">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.05] tracking-tight">
               <BlurText text="Crafting digital" />
               <br />
               <BlurText text="experiences with" delay={0.6} />
@@ -309,7 +311,7 @@ function Index() {
                 <BlurText text="precision." delay={1.2} />
               </span>
             </h1>
-            <div className="mt-8 text-2xl md:text-3xl font-mono flex flex-wrap items-center gap-3">
+            <div className="mt-6 md:mt-8 text-xl sm:text-2xl md:text-3xl font-mono flex flex-wrap items-center gap-2 sm:gap-3">
               <span>I&apos;m a</span>
               <RotatingText
                 texts={["Web Developer", "UI Designer", "Creative Coder", "3D Tinkerer"]}
@@ -325,7 +327,7 @@ function Index() {
               />
             </div>
 
-            <div className="mt-10 flex flex-wrap gap-4">
+            <div className="mt-8 md:mt-10 flex flex-wrap gap-3 sm:gap-4">
               <a
                 href="#projects"
                 className="group inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-[#fafafa] text-black font-semibold hover:shadow-[0_0_30px_#fafafa] transition-shadow"
@@ -341,7 +343,7 @@ function Index() {
               </a>
             </div>
 
-            <div className="mt-16 grid grid-cols-2 sm:grid-cols-4 gap-6 max-w-xl">
+            <div className="mt-12 md:mt-16 grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 max-w-xl">
               {stats.map((s, i) => (
                 <motion.div
                   key={s.label}
@@ -349,7 +351,7 @@ function Index() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 + i * 0.1, duration: 0.5 }}
                 >
-                  <div className="text-3xl md:text-4xl font-bold text-[#fafafa]">{s.value}</div>
+                  <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#fafafa]">{s.value}</div>
                   <div className="text-xs text-muted-foreground font-mono mt-1 uppercase tracking-wider">
                     {s.label}
                   </div>
@@ -358,7 +360,7 @@ function Index() {
             </div>
           </div>
 
-          <div className="relative">
+          <div className="relative order-first md:order-last">
             <PhotoCard />
           </div>
 
@@ -378,7 +380,7 @@ function Index() {
         <ScrollVelocity text="REACT ✦ THREE.JS ✦ TYPESCRIPT ✦ MOTION ✦ TAILWIND ✦ WEBGL ✦" />
 
         {/* ABOUT */}
-        <section id="about" className="relative max-w-7xl mx-auto px-6 py-32">
+        <section id="about" className="relative max-w-7xl mx-auto px-4 sm:px-6 py-20 md:py-32">
           <ScrollReveal>
             <div className="flex items-center gap-3 mb-16">
               <span className="font-mono text-xs text-[#a3a3a3] tracking-widest">✦ ABOUT</span>
@@ -405,14 +407,14 @@ function Index() {
 
                   {/* monogram — solid */}
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="font-display italic font-black text-[14rem] md:text-[16rem] leading-none text-foreground tracking-tighter">
+                    <span className="font-display italic font-black text-[10rem] sm:text-[14rem] md:text-[16rem] leading-none text-foreground tracking-tighter">
                       a
                     </span>
                   </div>
                   {/* monogram — outline overlay */}
                   <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
                     <span
-                      className="font-display italic font-black text-[14rem] md:text-[16rem] leading-none text-transparent tracking-tighter"
+                      className="font-display italic font-black text-[10rem] sm:text-[14rem] md:text-[16rem] leading-none text-transparent tracking-tighter"
                       style={{ WebkitTextStroke: "1px rgba(255,255,255,0.18)" }}
                     >
                       a
@@ -465,7 +467,7 @@ function Index() {
             {/* RIGHT — editorial bio */}
             <div className="md:col-span-7 space-y-12">
               <ScrollReveal>
-                <h2 className="text-4xl md:text-6xl font-bold leading-[1.05] tracking-tight">
+                <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-[1.05] tracking-tight">
                   Hi — I&apos;m{" "}
                   <span className="bg-gradient-to-r from-foreground via-foreground/80 to-foreground/40 bg-clip-text text-transparent">
                     Andra
@@ -549,7 +551,7 @@ function Index() {
         </section>
 
         {/* EDUCATION */}
-        <section id="education" className="relative max-w-7xl mx-auto px-6 py-32">
+        <section id="education" className="relative max-w-7xl mx-auto px-4 sm:px-6 py-20 md:py-32">
           <ScrollReveal>
             <div className="flex items-center gap-3 mb-10">
               <span className="font-mono text-xs text-[#a3a3a3] tracking-widest">✦ EDUCATION</span>
@@ -562,7 +564,7 @@ function Index() {
 
           <ScrollReveal>
             <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-8 mb-20">
-              <h2 className="text-5xl md:text-7xl font-bold leading-[1.02] tracking-tight max-w-3xl">
+              <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.02] tracking-tight max-w-3xl">
                 Where I learned <span className="italic font-display">the</span>{" "}
                 <span className="bg-gradient-to-r from-foreground via-foreground/70 to-foreground/30 bg-clip-text text-transparent">
                   craft.
@@ -637,11 +639,11 @@ function Index() {
                         >
                           {flip || (
                             <>
-                              <span className="text-[5rem] md:text-[8rem] text-foreground">
+                              <span className="text-[3.5rem] sm:text-[5rem] md:text-[6.5rem] lg:text-[8rem] text-foreground">
                                 {e.yearStart.slice(2)}
                               </span>
                               <span
-                                className="text-[5rem] md:text-[8rem] text-transparent"
+                                className="text-[3.5rem] sm:text-[5rem] md:text-[6.5rem] lg:text-[8rem] text-transparent"
                                 style={{
                                   WebkitTextStroke: "1px rgba(255,255,255,0.25)",
                                 }}
@@ -652,11 +654,11 @@ function Index() {
                           )}
                           {flip && (
                             <>
-                              <span className="text-[5rem] md:text-[8rem] text-foreground">
+                              <span className="text-[3.5rem] sm:text-[5rem] md:text-[6.5rem] lg:text-[8rem] text-foreground">
                                 {e.yearStart.slice(2)}
                               </span>
                               <span
-                                className="text-[5rem] md:text-[8rem] text-transparent"
+                                className="text-[3.5rem] sm:text-[5rem] md:text-[6.5rem] lg:text-[8rem] text-transparent"
                                 style={{
                                   WebkitTextStroke: "1px rgba(255,255,255,0.25)",
                                 }}
@@ -709,14 +711,14 @@ function Index() {
         </section>
 
         {/* SERVICES */}
-        <section id="services" className="max-w-7xl mx-auto px-6 py-24">
+        <section id="services" className="max-w-7xl mx-auto px-4 sm:px-6 py-16 md:py-24">
           <ScrollReveal>
             <div className="flex items-center gap-3 mb-6">
               <span className="font-mono text-xs text-[#a3a3a3] tracking-widest">✦ SERVICES</span>
               <span className="h-px flex-1 bg-white/10" />
             </div>
             <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-12">
-              <h2 className="text-5xl md:text-6xl font-bold">
+              <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold">
                 <ShinyText text="What I do." />
               </h2>
               <p className="text-muted-foreground max-w-md">
@@ -761,7 +763,7 @@ function Index() {
         </section>
 
         {/* PROJECTS */}
-        <section id="projects" className="max-w-7xl mx-auto px-6 py-24">
+        <section id="projects" className="max-w-7xl mx-auto px-4 sm:px-6 py-16 md:py-24">
           <ScrollReveal>
             <div className="flex items-center gap-3 mb-6">
               <span className="font-mono text-xs text-[#a3a3a3] tracking-widest">
@@ -770,7 +772,7 @@ function Index() {
               <span className="h-px flex-1 bg-white/10" />
             </div>
             <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-12">
-              <h2 className="text-5xl md:text-6xl font-bold">
+              <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold">
                 <ShinyText text="Selected work." />
               </h2>
               <p className="text-muted-foreground max-w-md">
@@ -811,13 +813,13 @@ function Index() {
         </section>
 
         {/* PROCESS */}
-        <section className="max-w-7xl mx-auto px-6 py-24">
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 py-16 md:py-24">
           <ScrollReveal>
             <div className="flex items-center gap-3 mb-6">
               <span className="font-mono text-xs text-[#a3a3a3] tracking-widest">✦ PROCESS</span>
               <span className="h-px flex-1 bg-white/10" />
             </div>
-            <h2 className="text-5xl md:text-6xl font-bold mb-12">
+            <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-12">
               <ShinyText text="How I work." />
             </h2>
           </ScrollReveal>
@@ -841,7 +843,7 @@ function Index() {
         </section>
 
         {/* CONTACT */}
-        <section id="contact" className="max-w-7xl mx-auto px-6 py-24">
+        <section id="contact" className="max-w-7xl mx-auto px-4 sm:px-6 py-16 md:py-24">
           <ScrollReveal>
             <div className="flex items-center gap-3 mb-6">
               <span className="font-mono text-xs text-[#a3a3a3] tracking-widest">✦ CONTACT</span>
