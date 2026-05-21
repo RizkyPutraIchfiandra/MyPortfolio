@@ -425,7 +425,7 @@ function Index() {
                     Online
                   </div>
                 </div>
-            </ScrollReveal>
+              </ScrollReveal>
 
               <ScrollReveal>
                 <div className="rounded-2xl border border-white/10 bg-[#171717]/70 backdrop-blur-md p-5">
@@ -469,10 +469,9 @@ function Index() {
               <ScrollReveal>
                 <div className="space-y-5 text-base md:text-lg leading-relaxed text-foreground/75 max-w-xl">
                   <p>
-                    Full name{" "}
-                    <span className="text-foreground">Rizky Putra Ichfiandra</span>. I work at the
-                    seam between design and engineering, building interfaces that feel alive, fast,
-                    and obsessively detailed.
+                    Full name <span className="text-foreground">Rizky Putra Ichfiandra</span>. I
+                    work at the seam between design and engineering, building interfaces that feel
+                    alive, fast, and obsessively detailed.
                   </p>
                   <p>
                     From physics-driven 3D scenes to pixel-perfect dashboards, every project is a
@@ -508,10 +507,7 @@ function Index() {
                     { label: "Clients", value: "12" },
                     { label: "Late nights", value: "\u221E" },
                   ].map((f) => (
-                    <div
-                      key={f.label}
-                      className="bg-[#0a0a0a] p-5 hover:bg-[#171717] transition"
-                    >
+                    <div key={f.label} className="bg-[#0a0a0a] p-5 hover:bg-[#171717] transition">
                       <div className="text-2xl md:text-3xl font-bold text-foreground">
                         {f.value}
                       </div>
@@ -541,8 +537,7 @@ function Index() {
           <ScrollReveal>
             <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-8 mb-20">
               <h2 className="text-5xl md:text-7xl font-bold leading-[1.02] tracking-tight max-w-3xl">
-                Where I learned{" "}
-                <span className="italic font-display">the</span>{" "}
+                Where I learned <span className="italic font-display">the</span>{" "}
                 <span className="bg-gradient-to-r from-foreground via-foreground/70 to-foreground/30 bg-clip-text text-transparent">
                   craft.
                 </span>
@@ -595,7 +590,9 @@ function Index() {
                       {/* YEAR DISPLAY */}
                       <div
                         className={`pl-12 md:pl-0 ${
-                          flip ? "md:order-2 md:text-left md:pl-12" : "md:order-1 md:text-right md:pr-12"
+                          flip
+                            ? "md:order-2 md:text-left md:pl-12"
+                            : "md:order-1 md:text-right md:pr-12"
                         }`}
                       >
                         <div className="font-mono text-[10px] text-[#a3a3a3] tracking-widest uppercase mb-2">
@@ -642,7 +639,9 @@ function Index() {
                       </div>
 
                       {/* CONTENT CARD */}
-                      <div className={`pl-12 md:pl-0 ${flip ? "md:order-1 md:pr-12" : "md:order-2 md:pl-12"}`}>
+                      <div
+                        className={`pl-12 md:pl-0 ${flip ? "md:order-1 md:pr-12" : "md:order-2 md:pl-12"}`}
+                      >
                         <div className="relative rounded-2xl border border-white/10 bg-[#171717]/70 backdrop-blur-md p-6 md:p-8 shadow-[0_8px_32px_rgba(0,0,0,0.4)] group-hover:border-foreground/30 group-hover:bg-[#171717]/90 transition">
                           {/* level badge */}
                           <div className="flex items-center gap-3 mb-5">
@@ -861,9 +860,7 @@ function Index() {
                       <div className="text-xs font-mono text-muted-foreground uppercase tracking-wider">
                         Github
                       </div>
-                      <div className="text-sm md:text-base truncate">
-                        @RizkyPutraIchfiandra
-                      </div>
+                      <div className="text-sm md:text-base truncate">@RizkyPutraIchfiandra</div>
                     </div>
                   </div>
                   <ArrowUpRight className="w-5 h-5 shrink-0 text-muted-foreground group-hover:text-[#fafafa] transition" />
@@ -905,7 +902,9 @@ function Index() {
                         <div className="text-xs font-mono text-muted-foreground uppercase tracking-wider">
                           Based in
                         </div>
-                        <div className="text-sm md:text-base truncate">Harvest City Cileungsi — ID</div>
+                        <div className="text-sm md:text-base truncate">
+                          Harvest City Cileungsi — ID
+                        </div>
                       </div>
                     </div>
                     <span className="text-xs font-mono text-muted-foreground shrink-0">GMT+7</span>

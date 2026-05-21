@@ -36,9 +36,7 @@ export function PhotoCard() {
               <span className="text-[10px] font-mono text-[#a3a3a3] tracking-widest uppercase">
                 // ID CARD
               </span>
-              <span className="text-[10px] font-mono text-[#a3a3a3] tracking-widest">
-                2026
-              </span>
+              <span className="text-[10px] font-mono text-[#a3a3a3] tracking-widest">2026</span>
             </div>
             <h3 className="text-lg md:text-xl font-bold text-foreground leading-tight">
               Rizky Putra Ichfiandra

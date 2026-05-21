@@ -42,22 +42,16 @@ export const ScrollVelocity = (_: { text?: string }) => {
   const row = [...stack, ...stack];
 
   return (
-    <section
-      aria-label="Tech stack"
-      className="relative my-24"
-    >
+    <section aria-label="Tech stack" className="relative my-24">
       {/* HEADER */}
       <div className="max-w-7xl mx-auto px-6 mb-10">
         <div className="flex items-center gap-3 mb-4">
-          <span className="font-mono text-xs text-[#a3a3a3] tracking-widest">
-            ✦ TECH STACK
-          </span>
+          <span className="font-mono text-xs text-[#a3a3a3] tracking-widest">✦ TECH STACK</span>
           <span className="h-px flex-1 bg-white/10" />
         </div>
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
           <h3 className="text-3xl md:text-5xl font-bold tracking-tight">
-            Tools I reach for{" "}
-            <span className="text-foreground/60">every day.</span>
+            Tools I reach for <span className="text-foreground/60">every day.</span>
           </h3>
           <p className="text-sm text-muted-foreground max-w-xs">
             Hover any chip to see it in its true colors.
