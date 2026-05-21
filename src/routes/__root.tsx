@@ -72,44 +72,31 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
+      { title: "Rizky Putra Ichfiandra — Portfolio" },
       {
         name: "description",
         content:
-          "A React portfolio website featuring interactive neon elements and dynamic text effects.",
+          "Portfolio of Rizky Putra Ichfiandra (Andra) — a creative developer & UI designer crafting expressive web experiences.",
       },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
+      { name: "author", content: "Rizky Putra Ichfiandra" },
+      { property: "og:title", content: "Rizky Putra Ichfiandra — Portfolio" },
       {
         property: "og:description",
         content:
-          "A React portfolio website featuring interactive neon elements and dynamic text effects.",
+          "Portfolio of Rizky Putra Ichfiandra (Andra) — a creative developer & UI designer crafting expressive web experiences.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
-      { name: "twitter:site", content: "@Lovable" },
-      { name: "twitter:title", content: "Lovable App" },
+      { name: "twitter:title", content: "Rizky Putra Ichfiandra — Portfolio" },
       {
         name: "twitter:description",
         content:
-          "A React portfolio website featuring interactive neon elements and dynamic text effects.",
-      },
-      {
-        property: "og:image",
-        content:
-          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/8f22d4fd-0e15-4d56-852f-5701a58a3941/id-preview-2d86a91b--41fac976-7f2a-49f8-911c-106ff53a0b1e.lovable.app-1778811649778.png",
-      },
-      {
-        name: "twitter:image",
-        content:
-          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/8f22d4fd-0e15-4d56-852f-5701a58a3941/id-preview-2d86a91b--41fac976-7f2a-49f8-911c-106ff53a0b1e.lovable.app-1778811649778.png",
+          "Portfolio of Rizky Putra Ichfiandra (Andra) — a creative developer & UI designer crafting expressive web experiences.",
       },
     ],
     links: [
-      {
-        rel: "stylesheet",
-        href: appCss,
-      },
+      { rel: "stylesheet", href: appCss },
+      { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
     ],
   }),
   shellComponent: RootShell,

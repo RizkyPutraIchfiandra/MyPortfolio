@@ -282,11 +282,11 @@ function Index() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#fafafa] opacity-75" />
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-[#fafafa]" />
               </span>
-              Open for select work — Q3 2026
+              Available for collaboration
             </motion.div>
 
             <p className="font-mono text-xs text-[#a3a3a3] mb-6 tracking-widest">
-              // PORTFOLIO — V.2026
+              // BASED IN CIBINONG, ID
             </p>
             <h1 className="text-5xl md:text-7xl font-bold leading-[1.05] tracking-tight">
               <BlurText text="Crafting digital" />
