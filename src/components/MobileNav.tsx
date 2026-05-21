@@ -29,9 +29,9 @@ export function MobileNav() {
         aria-label={open ? "Close menu" : "Open menu"}
         aria-expanded={open}
         onClick={() => setOpen((o) => !o)}
-        className="md:hidden inline-flex items-center justify-center w-10 h-10 rounded-lg border border-white/10 bg-white/[0.02] text-foreground hover:bg-white/[0.06] transition"
+        className="md:hidden relative z-50 inline-flex items-center justify-center w-10 h-10 -mr-2 text-foreground/80 hover:text-foreground transition"
       >
-        {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+        {open ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
       </button>
 
       <AnimatePresence>
