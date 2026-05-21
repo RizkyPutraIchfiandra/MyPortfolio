@@ -60,9 +60,9 @@ const skills = [
 ];
 
 const stats = [
-  { value: "2", label: "Years coding" },
-  { value: "8", label: "Projects built" },
-  { value: "2", label: "Clients" },
+  { value: "2+", label: "Years coding" },
+  { value: "8+", label: "Projects built" },
+  { value: "2+", label: "Clients" },
   { value: "\u221E", label: "Late nights" },
 ];
 
@@ -221,7 +221,7 @@ function Index() {
         <ShapeGrid
           speed={0.4}
           squareSize={48}
-          direction="di agonal"
+          direction="diagonal"
           borderColor="#262626"
           hoverFillColor="#1f1f1f"
           shape="square"
@@ -528,9 +528,9 @@ function Index() {
               <ScrollReveal>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-px rounded-2xl overflow-hidden border border-white/10 bg-white/10">
                   {[
-                    { label: "Years coding", value: "2" },
-                    { label: "Projects", value: "8" },
-                    { label: "Clients", value: "2" },
+                    { label: "Years coding", value: "2+" },
+                    { label: "Projects", value: "8+" },
+                    { label: "Clients", value: "2+" },
                     { label: "Late nights", value: "\u221E" },
                   ].map((f) => (
                     <div key={f.label} className="bg-[#0a0a0a] p-5 hover:bg-[#171717] transition">
@@ -630,7 +630,11 @@ function Index() {
                             </span>
                           )}
                         </div>
-                        <div className="flex items-baseline gap-3 md:justify-end font-display font-black leading-none tracking-tighter">
+                        <div
+                          className={`flex items-baseline gap-3 font-display font-black leading-none tracking-tighter ${
+                            flip ? "md:justify-start" : "md:justify-end"
+                          }`}
+                        >
                           {flip || (
                             <>
                               <span className="text-[5rem] md:text-[8rem] text-foreground">
