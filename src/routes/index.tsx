@@ -13,6 +13,16 @@ import {
   MapPin,
   GraduationCap,
 } from "lucide-react";
+import {
+  SiReact,
+  SiTypescript,
+  SiTailwindcss,
+  SiFramer,
+  SiFigma,
+  SiGithub,
+  SiVercel,
+  SiNetlify,
+} from "react-icons/si";
 import ShapeGrid from "@/components/effects/ShapeGrid.jsx";
 import { PhotoCard } from "@/components/PhotoCard";
 import { BlurText } from "@/components/effects/BlurText";
@@ -39,19 +49,21 @@ export const Route = createFileRoute("/")({
 });
 
 const skills = [
-  "React & TypeScript",
-  "Three.js / WebGL",
-  "Tailwind & Design Tokens",
-  "Framer Motion",
-  "UI / UX Systems",
-  "Node.js & Edge APIs",
+  { Icon: SiReact, label: "React", color: "#61DAFB" },
+  { Icon: SiTypescript, label: "TypeScript", color: "#3178C6" },
+  { Icon: SiTailwindcss, label: "Tailwind", color: "#06B6D4" },
+  { Icon: SiFramer, label: "Framer Motion", color: "#E879F9" },
+  { Icon: SiFigma, label: "Figma", color: "#F24E1E" },
+  { Icon: SiGithub, label: "GitHub", color: "#ffffff" },
+  { Icon: SiVercel, label: "Vercel", color: "#ffffff" },
+  { Icon: SiNetlify, label: "Netlify", color: "#00C7B7" },
 ];
 
 const stats = [
-  { value: "5+", label: "Years crafting" },
-  { value: "40+", label: "Products shipped" },
-  { value: "12", label: "Global clients" },
-  { value: "99%", label: "Satisfaction rate" },
+  { value: "2", label: "Years coding" },
+  { value: "8", label: "Projects built" },
+  { value: "2", label: "Clients" },
+  { value: "\u221E", label: "Late nights" },
 ];
 
 const services = [
@@ -209,7 +221,7 @@ function Index() {
         <ShapeGrid
           speed={0.4}
           squareSize={48}
-          direction="diagonal"
+          direction="di agonal"
           borderColor="#262626"
           hoverFillColor="#1f1f1f"
           shape="square"
@@ -483,17 +495,31 @@ function Index() {
 
               <ScrollReveal>
                 <div>
-                  <div className="text-[10px] font-mono uppercase tracking-widest text-[#a3a3a3] mb-4">
-                    // stack
+                  <div className="flex items-center gap-3 mb-5">
+                    <span className="text-[10px] font-mono uppercase tracking-widest text-[#a3a3a3]">
+                      // stack
+                    </span>
+                    <span className="h-px flex-1 bg-white/10" />
+                    <span className="text-[10px] font-mono text-foreground/40 tracking-widest uppercase">
+                      {skills.length} tools
+                    </span>
                   </div>
-                  <div className="flex flex-wrap gap-2">
-                    {skills.map((s) => (
-                      <span
-                        key={s}
-                        className="px-3.5 py-2 text-sm font-mono rounded-full border border-white/10 bg-white/[0.02] text-foreground/80 hover:border-white/30 hover:bg-white/[0.06] hover:text-foreground transition"
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                    {skills.map(({ Icon, label, color }) => (
+                      <div
+                        key={label}
+                        style={{ ["--brand" as string]: color } as React.CSSProperties}
+                        className="group relative flex items-center gap-2.5 px-3 py-3 rounded-xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.06] hover:-translate-y-0.5 transition-all duration-300"
                       >
-                        {s}
-                      </span>
+                        <div className="pointer-events-none absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 ring-1 ring-[var(--brand)]/40" />
+                        <Icon
+                          className="w-4 h-4 shrink-0 text-foreground/70 group-hover:text-[var(--brand)] transition-colors duration-300"
+                          aria-hidden="true"
+                        />
+                        <span className="text-xs md:text-sm font-medium text-foreground/80 group-hover:text-foreground transition-colors truncate">
+                          {label}
+                        </span>
+                      </div>
                     ))}
                   </div>
                 </div>
@@ -502,9 +528,9 @@ function Index() {
               <ScrollReveal>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-px rounded-2xl overflow-hidden border border-white/10 bg-white/10">
                   {[
-                    { label: "Years coding", value: "5+" },
-                    { label: "Projects", value: "40+" },
-                    { label: "Clients", value: "12" },
+                    { label: "Years coding", value: "2" },
+                    { label: "Projects", value: "8" },
+                    { label: "Clients", value: "2" },
                     { label: "Late nights", value: "\u221E" },
                   ].map((f) => (
                     <div key={f.label} className="bg-[#0a0a0a] p-5 hover:bg-[#171717] transition">
