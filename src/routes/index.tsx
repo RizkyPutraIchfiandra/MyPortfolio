@@ -189,6 +189,14 @@ const figmaProjects = [
 
 const devProjects = [
   {
+    title: "SiPresMa UCN",
+    image: "/projects/SiPresMaUCN.png",
+    desc: "Sistem Presensi Mahasiswa berbasis pengenalan wajah untuk Universitas Catur Nusantara — multi-frame averaging + L2-normalization untuk akurasi tinggi tanpa menyimpan foto wajah (cuma vektor 128-dimensi). Dashboard admin dengan statistik real-time, manajemen mahasiswa, dan riwayat presensi.",
+    link: "https://sipresma-ucn.vercel.app/",
+    tags: ["Next.js 14", "face-api.js", "PostgreSQL", "Prisma", "NextAuth"],
+    course: "Full-stack · ML",
+  },
+  {
     title: "Malazzz — YouTuber Website",
     image: "/projects/malazzz.png",
     desc: "Website personal untuk seorang YouTuber — dilengkapi real-time stats TikTok & YouTube (views, likes, subscribers, followers) yang update otomatis.",
