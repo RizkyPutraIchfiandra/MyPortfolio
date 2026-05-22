@@ -307,10 +307,7 @@ function Index() {
               Available for collaboration
             </motion.div>
 
-            <p className="font-mono text-xs text-[#a3a3a3] mb-6 tracking-widest">
-              // BASED IN CILEUNGSI, ID
-            </p>
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.05] tracking-tight">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.15] tracking-tight">
               <BlurText text="Crafting digital" wordClassName="shiny-text" />
               <br />
               <BlurText text="experiences with" wordClassName="shiny-text" delay={0.6} />
