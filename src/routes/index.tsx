@@ -191,7 +191,7 @@ const devProjects = [
   {
     title: "SiPresMa UCN",
     image: "/projects/SiPresMaUCN.png",
-    desc: "Sistem Presensi Mahasiswa berbasis pengenalan wajah untuk Universitas Catur Nusantara — multi-frame averaging + L2-normalization untuk akurasi tinggi tanpa menyimpan foto wajah (cuma vektor 128-dimensi). Dashboard admin dengan statistik real-time, manajemen mahasiswa, dan riwayat presensi.",
+    desc: "Sistem Presensi Mahasiswa berbasis pengenalan wajah untuk Universitas Cendekia Nusantara — multi-frame averaging + L2-normalization untuk akurasi tinggi tanpa menyimpan foto wajah (cuma vektor 128-dimensi). Dashboard admin dengan statistik real-time, manajemen mahasiswa, dan riwayat presensi.",
     link: "https://sipresma-ucn.vercel.app/",
     tags: ["Next.js 14", "face-api.js", "PostgreSQL", "Prisma", "NextAuth"],
     course: "Full-stack · ML",
