@@ -1,14 +1,5 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import {
-  Outlet,
-  Link,
-  createRootRouteWithContext,
-  useRouter,
-  HeadContent,
-  Scripts,
-} from "@tanstack/react-router";
-
-import appCss from "../styles.css?url";
+import { QueryClient } from "@tanstack/react-query";
+import { Outlet, Link, createRootRouteWithContext, useRouter } from "@tanstack/react-router";
 
 function NotFoundComponent() {
   return (
@@ -68,63 +59,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
-  head: () => ({
-    meta: [
-      { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Rizky Putra Ichfiandra — Portfolio" },
-      {
-        name: "description",
-        content:
-          "Portfolio of Rizky Putra Ichfiandra (Andra) — a creative developer & UI designer crafting expressive web experiences.",
-      },
-      { name: "author", content: "Rizky Putra Ichfiandra" },
-      { property: "og:title", content: "Rizky Putra Ichfiandra — Portfolio" },
-      {
-        property: "og:description",
-        content:
-          "Portfolio of Rizky Putra Ichfiandra (Andra) — a creative developer & UI designer crafting expressive web experiences.",
-      },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-      { name: "twitter:title", content: "Rizky Putra Ichfiandra — Portfolio" },
-      {
-        name: "twitter:description",
-        content:
-          "Portfolio of Rizky Putra Ichfiandra (Andra) — a creative developer & UI designer crafting expressive web experiences.",
-      },
-    ],
-    links: [
-      { rel: "stylesheet", href: appCss },
-      { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
-    ],
-  }),
-  shellComponent: RootShell,
-  component: RootComponent,
+  component: Outlet,
   notFoundComponent: NotFoundComponent,
   errorComponent: ErrorComponent,
 });
-
-function RootShell({ children }: { children: React.ReactNode }) {
-  return (
-    <html lang="en">
-      <head>
-        <HeadContent />
-      </head>
-      <body>
-        {children}
-        <Scripts />
-      </body>
-    </html>
-  );
-}
-
-function RootComponent() {
-  const { queryClient } = Route.useRouteContext();
-
-  return (
-    <QueryClientProvider client={queryClient}>
-      <Outlet />
-    </QueryClientProvider>
-  );
-}
