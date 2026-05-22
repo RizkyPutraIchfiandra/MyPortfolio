@@ -311,13 +311,11 @@ function Index() {
               // BASED IN CILEUNGSI, ID
             </p>
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.05] tracking-tight">
-              <BlurText text="Crafting digital" />
+              <BlurText text="Crafting digital" wordClassName="shiny-text" />
               <br />
-              <BlurText text="experiences with" delay={0.6} />
+              <BlurText text="experiences with" wordClassName="shiny-text" delay={0.6} />
               <br />
-              <span className="text-[#fafafa]">
-                <BlurText text="precision." delay={1.2} />
-              </span>
+              <BlurText text="precision." wordClassName="shiny-text" delay={1.2} />
             </h1>
             <div className="mt-6 md:mt-8 text-xl sm:text-2xl md:text-3xl font-mono flex flex-wrap items-center gap-2 sm:gap-3">
               <span>I&apos;m a</span>
@@ -476,14 +474,10 @@ function Index() {
             <div className="md:col-span-7 space-y-12">
               <ScrollReveal>
                 <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-[1.05] tracking-tight">
-                  Hi — I&apos;m{" "}
-                  <span className="bg-gradient-to-r from-foreground via-foreground/80 to-foreground/40 bg-clip-text text-transparent">
-                    Andra
-                  </span>
-                  .
+                  <span className="shiny-text">Hi — I&apos;m Andra.</span>
                   <br />
                   <span className="text-foreground/55">
-                    A creative developer based in Cileungsi.
+                    Crafting interfaces with quiet obsession.
                   </span>
                 </h2>
               </ScrollReveal>
@@ -573,9 +567,8 @@ function Index() {
           <ScrollReveal>
             <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-8 mb-20">
               <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.02] tracking-tight max-w-3xl">
-                Where I learned <span className="italic font-display">the</span>{" "}
-                <span className="bg-gradient-to-r from-foreground via-foreground/70 to-foreground/30 bg-clip-text text-transparent">
-                  craft.
+                <span className="shiny-text">
+                  Where I learned <span className="italic font-display">the</span> craft.
                 </span>
               </h2>
               <p className="text-muted-foreground max-w-xs text-base leading-relaxed">

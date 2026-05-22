@@ -51,7 +51,7 @@ export const ScrollVelocity = (_: { text?: string }) => {
         </div>
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
           <h3 className="text-3xl md:text-5xl font-bold tracking-tight">
-            Tools I reach for <span className="text-foreground/60">every day.</span>
+            <span className="shiny-text">Tools I reach for every day.</span>
           </h3>
           <p className="text-sm text-muted-foreground max-w-xs">
             Hover any chip to see it in its true colors.
