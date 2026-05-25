@@ -220,6 +220,14 @@ const devProjects = [
     tags: ["React", "Algorithm", "Bioinformatics"],
     course: "Collaborative Project",
   },
+  {
+    title: "UPGMA Phylogenetic Tree",
+    image: "/projects/Upgma.png",
+    desc: "Visualisasi pohon filogenetik dengan algoritma UPGMA (Unweighted Pair Group Method with Arithmetic Mean) — input distance matrix, output tree diagram interaktif yang menggambarkan hubungan evolusi antar spesies. Step-by-step clustering biar kelihatan jelas bagaimana setiap pasangan digabung berdasarkan jarak rata-rata terdekat.",
+    link: "https://upgma-phylogenetic.netlify.app/",
+    tags: ["React", "Algorithm", "Bioinformatics", "Data Viz"],
+    course: "Bioinformatics",
+  },
 ];
 
 function Index() {
