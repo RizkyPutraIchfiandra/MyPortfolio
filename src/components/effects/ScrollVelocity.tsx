@@ -3,16 +3,16 @@ import { motion } from "framer-motion";
 import {
   SiReact,
   SiTypescript,
-  SiThreedotjs,
-  SiTailwindcss,
-  SiFramer,
   SiNextdotjs,
-  SiNodedotjs,
+  SiTailwindcss,
+  SiPostgresql,
+  SiPrisma,
+  SiPython,
   SiFigma,
   SiVite,
   SiGithub,
-  SiWebgl,
-  SiGreensock,
+  SiVercel,
+  SiNetlify,
 } from "react-icons/si";
 
 type IconItem = {
@@ -24,17 +24,17 @@ type IconItem = {
 
 const stack: IconItem[] = [
   { Icon: SiReact, label: "React", color: "#61DAFB" },
-  { Icon: SiTypescript, label: "TypeScript", color: "#3178C6" },
   { Icon: SiNextdotjs, label: "Next.js", color: "#ffffff" },
-  { Icon: SiTailwindcss, label: "Tailwind", color: "#06B6D4" },
-  { Icon: SiThreedotjs, label: "Three.js", color: "#ffffff" },
-  { Icon: SiWebgl, label: "WebGL", color: "#E34F26" },
-  { Icon: SiFramer, label: "Framer Motion", color: "#E879F9" },
-  { Icon: SiGreensock, label: "GSAP", color: "#88CE02" },
-  { Icon: SiVite, label: "Vite", color: "#646CFF" },
-  { Icon: SiNodedotjs, label: "Node.js", color: "#5FA04E" },
+  { Icon: SiTypescript, label: "TypeScript", color: "#3178C6" },
+  { Icon: SiTailwindcss, label: "Tailwind CSS", color: "#06B6D4" },
+  { Icon: SiPostgresql, label: "PostgreSQL", color: "#4169E1" },
+  { Icon: SiPrisma, label: "Prisma", color: "#2D3748" },
+  { Icon: SiPython, label: "Python", color: "#3776AB" },
   { Icon: SiFigma, label: "Figma", color: "#F24E1E" },
+  { Icon: SiVite, label: "Vite", color: "#646CFF" },
   { Icon: SiGithub, label: "GitHub", color: "#ffffff" },
+  { Icon: SiVercel, label: "Vercel", color: "#ffffff" },
+  { Icon: SiNetlify, label: "Netlify", color: "#00C7B7" },
 ];
 
 export const ScrollVelocity = (_: { text?: string }) => {

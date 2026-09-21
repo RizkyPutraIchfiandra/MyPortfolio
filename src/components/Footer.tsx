@@ -53,7 +53,7 @@ export default function Footer() {
           {/* Brand column */}
           <div className="lg:col-span-2 flex flex-col gap-6">
             <span className="text-[#a3a3a3] text-xs font-mono tracking-wider uppercase">
-              // LET&apos;S BUILD — V.2026
+              LET&apos;S BUILD
             </span>
 
             <h2 className="text-4xl md:text-5xl font-bold leading-[1.05] tracking-tight">
@@ -159,26 +159,8 @@ export default function Footer() {
         {/* BOTTOM BAR */}
         <div className="relative z-10 mt-8 pt-8 border-t border-white/5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <p className="text-foreground/60 text-sm">
-            © 2026 Rizky Putra Ichfiandra. Crafted with intent.
+            © 2026 Rizky Putra Ichfiandra. All rights reserved.
           </p>
-
-          <div className="flex items-center gap-5">
-            <a
-              href="#privacy"
-              className="text-foreground/60 text-sm hover:text-[#a3a3a3] transition-colors duration-200"
-            >
-              Privacy
-            </a>
-            <a
-              href="#colophon"
-              className="text-foreground/60 text-sm hover:text-[#a3a3a3] transition-colors duration-200"
-            >
-              Colophon
-            </a>
-            <span className="inline-flex items-center px-3 py-1 rounded-full border border-white/10 text-foreground/60 text-xs font-mono tracking-wider">
-              v2026.05
-            </span>
-          </div>
         </div>
       </div>
     </footer>

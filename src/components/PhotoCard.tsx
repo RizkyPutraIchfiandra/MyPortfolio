@@ -34,7 +34,7 @@ export function PhotoCard() {
           <div className="p-5 border-t border-white/10 bg-[#0a0a0a]/60 backdrop-blur-md">
             <div className="flex items-center justify-between mb-2">
               <span className="text-[10px] font-mono text-[#a3a3a3] tracking-widest uppercase">
-                // ID CARD
+                ID CARD
               </span>
               <span className="text-[10px] font-mono text-[#a3a3a3] tracking-widest">2026</span>
             </div>

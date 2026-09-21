@@ -5,19 +5,22 @@ import {
   ArrowDown,
   Code2,
   Palette,
-  Boxes,
   Sparkles,
   Github,
   Linkedin,
   Mail,
   MapPin,
   GraduationCap,
+  BrainCircuit,
 } from "lucide-react";
 import {
   SiReact,
   SiTypescript,
   SiTailwindcss,
-  SiFramer,
+  SiNextdotjs,
+  SiPostgresql,
+  SiPrisma,
+  SiPython,
   SiFigma,
   SiGithub,
   SiVercel,
@@ -39,11 +42,11 @@ export const Route = createFileRoute("/")({
   component: Index,
   head: () => ({
     meta: [
-      { title: "Rizky Putra Ichfiandra — Creative Developer Portfolio" },
+      { title: "Rizky Putra Ichfiandra — Software Engineer & UI Designer" },
       {
         name: "description",
         content:
-          "Portfolio of Rizky Putra Ichfiandra (Andra) — a creative developer crafting fast, expressive web experiences with React, Three.js, and motion.",
+          "Portfolio of Rizky Putra Ichfiandra (Andra) — crafting functional web applications, intuitive UI designs, and applied AI/ML systems.",
       },
     ],
   }),
@@ -51,9 +54,12 @@ export const Route = createFileRoute("/")({
 
 const skills = [
   { Icon: SiReact, label: "React", color: "#61DAFB" },
+  { Icon: SiNextdotjs, label: "Next.js", color: "#ffffff" },
   { Icon: SiTypescript, label: "TypeScript", color: "#3178C6" },
-  { Icon: SiTailwindcss, label: "Tailwind", color: "#06B6D4" },
-  { Icon: SiFramer, label: "Framer Motion", color: "#E879F9" },
+  { Icon: SiTailwindcss, label: "Tailwind CSS", color: "#06B6D4" },
+  { Icon: SiPostgresql, label: "PostgreSQL", color: "#4169E1" },
+  { Icon: SiPrisma, label: "Prisma", color: "#2D3748" },
+  { Icon: SiPython, label: "Python & NLP", color: "#3776AB" },
   { Icon: SiFigma, label: "Figma", color: "#F24E1E" },
   { Icon: SiGithub, label: "GitHub", color: "#ffffff" },
   { Icon: SiVercel, label: "Vercel", color: "#ffffff" },
@@ -62,53 +68,9 @@ const skills = [
 
 const stats = [
   { value: "2+", label: "Years coding" },
-  { value: "8+", label: "Projects built" },
+  { value: "11+", label: "Projects built" },
   { value: "2+", label: "Clients" },
-  { value: "\u221E", label: "Late nights" },
-];
-
-const services = [
-  {
-    icon: Code2,
-    title: "Web Engineering",
-    desc: "Production-grade web apps built on React and TypeScript — clean architecture, fast loads, future-proof.",
-    tags: ["React", "TypeScript", "Edge"],
-  },
-  {
-    icon: Palette,
-    title: "Interface Design",
-    desc: "Design systems and interfaces with character — consistent, accessible, and tuned to the last pixel.",
-    tags: ["Figma", "Design System", "Motion"],
-  },
-  {
-    icon: Boxes,
-    title: "3D & Immersive",
-    desc: "WebGL experiences that feel alive — from physics-based product viewers to fully interactive worlds.",
-    tags: ["Three.js", "R3F", "GLSL"],
-  },
-];
-
-const process = [
-  {
-    step: "01",
-    title: "Discover",
-    desc: "Get the goals, audience, and constraints right before a single pixel is drawn.",
-  },
-  {
-    step: "02",
-    title: "Design",
-    desc: "Wireframes, prototypes, and a visual system that holds up across every device.",
-  },
-  {
-    step: "03",
-    title: "Build",
-    desc: "Tight implementation focused on performance, accessibility, and motion that means something.",
-  },
-  {
-    step: "04",
-    title: "Ship",
-    desc: "Release, measure, iterate. Great products are alive — they keep getting sharper.",
-  },
+  { value: "∞", label: "Curiosity" },
 ];
 
 const education = [
@@ -189,6 +151,14 @@ const figmaProjects = [
 
 const devProjects = [
   {
+    title: "Personality Reranker",
+    image: "/projects/personalityreranker.png",
+    desc: "Bilingual AI response-quality classifier yang menilai kandidat balasan AI berdasarkan emotional appropriateness & kesesuaian nada. Didukung 4 model terlatih (mBERT fine-tuned, Small Transformer, Bi-LSTM, TF-IDF) untuk evaluasi respons hangat vs dingin secara real-time.",
+    link: "https://ai-personality-reranker.vercel.app/",
+    tags: ["mBERT", "Transformers", "NLP / AI", "React", "Bilingual ID/EN"],
+    course: "AI · NLP",
+  },
+  {
     title: "SiPresMa UCN",
     image: "/projects/SiPresMaUCN.png",
     desc: "Sistem Presensi Mahasiswa berbasis pengenalan wajah untuk Universitas Cendekia Nusantara — multi-frame averaging + L2-normalization untuk akurasi tinggi tanpa menyimpan foto wajah (cuma vektor 128-dimensi). Dashboard admin dengan statistik real-time, manajemen mahasiswa, dan riwayat presensi.",
@@ -198,7 +168,7 @@ const devProjects = [
   },
   {
     title: "Malazzz — YouTuber Website",
-    image: "/projects/malazzz.png",
+    image: "/projects/malazzz.jpeg",
     desc: "Website personal untuk seorang YouTuber — dilengkapi real-time stats TikTok & YouTube (views, likes, subscribers, followers) yang update otomatis.",
     link: "https://aku-malazzz.vercel.app/",
     tags: ["React", "API Integration", "Real-time Stats"],
@@ -275,9 +245,6 @@ function Index() {
               <a href="#education" className="hover:text-[#fafafa] transition">
                 Education
               </a>
-              <a href="#services" className="hover:text-[#fafafa] transition">
-                Services
-              </a>
               <a href="#projects" className="hover:text-[#fafafa] transition">
                 Work
               </a>
@@ -316,16 +283,16 @@ function Index() {
             </motion.div>
 
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.15] tracking-tight">
-              <BlurText text="Crafting digital" wordClassName="shiny-text" />
+              <BlurText text="Building products" wordClassName="shiny-text" />
               <br />
-              <BlurText text="experiences with" wordClassName="shiny-text" delay={0.6} />
+              <BlurText text="that people love" wordClassName="shiny-text" delay={0.6} />
               <br />
-              <BlurText text="precision." wordClassName="shiny-text" delay={1.2} />
+              <BlurText text="to use." wordClassName="shiny-text" delay={1.2} />
             </h1>
             <div className="mt-6 md:mt-8 text-xl sm:text-2xl md:text-3xl font-mono flex flex-wrap items-center gap-2 sm:gap-3">
               <span>I&apos;m a</span>
               <RotatingText
-                texts={["Web Developer", "UI Designer", "Creative Coder", "3D Tinkerer"]}
+                texts={["Software Engineer", "Frontend Developer", "UI/UX Designer", "Tech Enthusiast"]}
                 mainClassName="px-3 md:px-4 py-1 md:py-2 bg-gradient-to-r from-[#fafafa] to-[#d4d4d4] text-black font-bold rounded-lg overflow-hidden justify-center"
                 staggerFrom="last"
                 initial={{ y: "100%" }}
@@ -388,7 +355,7 @@ function Index() {
           </motion.a>
         </section>
 
-        <ScrollVelocity text="REACT ✦ THREE.JS ✦ TYPESCRIPT ✦ MOTION ✦ TAILWIND ✦ WEBGL ✦" />
+        <ScrollVelocity text="REACT ✦ NEXT.JS ✦ TYPESCRIPT ✦ TAILWIND ✦ FIGMA ✦ PYTHON ✦ POSTGRESQL ✦" />
 
         {/* ABOUT */}
         <section id="about" className="relative max-w-7xl mx-auto px-4 sm:px-6 py-20 md:py-32">
@@ -403,72 +370,35 @@ function Index() {
             {/* LEFT — Monogram + Now */}
             <div className="md:col-span-5 space-y-4 md:sticky md:top-28">
               <ScrollReveal>
-                <div className="relative aspect-square w-full rounded-3xl border border-white/10 bg-gradient-to-br from-[#171717] via-[#0f0f0f] to-[#0a0a0a] overflow-hidden">
-                  {/* grid pattern */}
-                  <div
-                    className="absolute inset-0 opacity-[0.06]"
-                    style={{
-                      backgroundImage:
-                        "linear-gradient(white 1px, transparent 1px), linear-gradient(90deg, white 1px, transparent 1px)",
-                      backgroundSize: "48px 48px",
-                    }}
+                <div className="relative aspect-square w-full rounded-3xl border border-white/10 bg-gradient-to-br from-[#171717] via-[#0f0f0f] to-[#0a0a0a] overflow-hidden group shadow-[0_12px_40px_rgba(0,0,0,0.5)]">
+                  <img
+                    src="/projects/anim.jpeg"
+                    alt="Rizky Putra Ichfiandra"
+                    className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
                   />
-                  {/* center radial glow */}
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.06),transparent_60%)]" />
-
-                  {/* monogram — solid */}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="font-display italic font-black text-[10rem] sm:text-[14rem] md:text-[16rem] leading-none text-foreground tracking-tighter">
-                      a
-                    </span>
-                  </div>
-                  {/* monogram — outline overlay */}
-                  <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-                    <span
-                      className="font-display italic font-black text-[10rem] sm:text-[14rem] md:text-[16rem] leading-none text-transparent tracking-tighter"
-                      style={{ WebkitTextStroke: "1px rgba(255,255,255,0.18)" }}
-                    >
-                      a
-                    </span>
-                  </div>
-
-                  {/* corner labels */}
-                  <div className="absolute top-5 left-5 font-mono text-[10px] text-foreground/55 tracking-widest uppercase">
-                    // RPI · 2026
-                  </div>
-                  <div className="absolute top-5 right-5 font-mono text-[10px] text-foreground/55 tracking-widest uppercase">
-                    ID / GMT+7
-                  </div>
-                  <div className="absolute bottom-5 left-5 font-mono text-[10px] text-foreground/55 tracking-widest uppercase">
-                    Cileungsi, Bogor
-                  </div>
-                  <div className="absolute bottom-5 right-5 font-mono text-[10px] text-foreground tracking-widest uppercase flex items-center gap-1.5">
-                    <span className="relative flex h-1.5 w-1.5">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#fafafa] opacity-75" />
-                      <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#fafafa]" />
-                    </span>
-                    Online
-                  </div>
+                  {/* subtle vignette */}
+                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#0a0a0a]/50 via-transparent to-transparent" />
+                  <div className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-white/10 rounded-3xl" />
                 </div>
               </ScrollReveal>
 
               <ScrollReveal>
                 <div className="rounded-2xl border border-white/10 bg-[#171717]/70 backdrop-blur-md p-5">
                   <div className="text-[10px] font-mono uppercase tracking-widest text-[#a3a3a3] mb-3">
-                    // currently
+                    CURRENT FOCUS
                   </div>
                   <ul className="space-y-2.5 font-mono text-sm">
                     <li className="flex items-start gap-3">
                       <span className="text-foreground/40 shrink-0 w-20">building</span>
-                      <span className="text-foreground/90">a 3D portfolio · v2026</span>
+                      <span className="text-foreground/90">KARM Web Project</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <span className="text-foreground/40 shrink-0 w-20">research</span>
+                      <span className="text-foreground/90">Research Methodology</span>
                     </li>
                     <li className="flex items-start gap-3">
                       <span className="text-foreground/40 shrink-0 w-20">studying</span>
-                      <span className="text-foreground/90">CS · Software Engineering</span>
-                    </li>
-                    <li className="flex items-start gap-3">
-                      <span className="text-foreground/40 shrink-0 w-20">exploring</span>
-                      <span className="text-foreground/90">WebGL shaders &amp; GLSL</span>
+                      <span className="text-foreground/90">Computer Science · Software Engineering</span>
                     </li>
                   </ul>
                 </div>
@@ -482,7 +412,7 @@ function Index() {
                   <span className="shiny-text">Hi — I&apos;m Andra.</span>
                   <br />
                   <span className="text-foreground/55">
-                    Crafting interfaces with quiet obsession.
+                    Turning ideas into clean code and intuitive designs.
                   </span>
                 </h2>
               </ScrollReveal>
@@ -490,14 +420,10 @@ function Index() {
               <ScrollReveal>
                 <div className="space-y-5 text-base md:text-lg leading-relaxed text-foreground/75 max-w-xl">
                   <p>
-                    Full name <span className="text-foreground">Rizky Putra Ichfiandra</span>. I
-                    work at the seam between design and engineering, building interfaces that feel
-                    alive, fast, and obsessively detailed.
+                    Nama lengkap <span className="text-foreground">Rizky Putra Ichfiandra</span>. Mahasiswa <span className="text-foreground font-medium">Computer Science (Software Engineering)</span> yang antusias menggabungkan estetika UI/UX dengan arsitektur software yang solid dan scalable.
                   </p>
                   <p>
-                    From physics-driven 3D scenes to pixel-perfect dashboards, every project is a
-                    chance to push the medium a little further. I care about the small stuff —
-                    easing curves, micro-interactions, the right shade of gray.
+                    Mulai dari eksplorasi desain di Figma, implementasi web app modern berbasis React &amp; Next.js, hingga eksplorasi algoritma dan model AI/NLP. Bagi saya, setiap project adalah wadah untuk bereksperimen, belajar mendalam, dan menghasilkan produk digital yang bermanfaat.
                   </p>
                 </div>
               </ScrollReveal>
@@ -506,7 +432,7 @@ function Index() {
                 <div>
                   <div className="flex items-center gap-3 mb-5">
                     <span className="text-[10px] font-mono uppercase tracking-widest text-[#a3a3a3]">
-                      // stack
+                      TECH STACK
                     </span>
                     <span className="h-px flex-1 bg-white/10" />
                     <span className="text-[10px] font-mono text-foreground/40 tracking-widest uppercase">
@@ -536,12 +462,7 @@ function Index() {
 
               <ScrollReveal>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-px rounded-2xl overflow-hidden border border-white/10 bg-white/10">
-                  {[
-                    { label: "Years coding", value: "2+" },
-                    { label: "Projects", value: "8+" },
-                    { label: "Clients", value: "2+" },
-                    { label: "Late nights", value: "\u221E" },
-                  ].map((f) => (
+                  {stats.map((f) => (
                     <div key={f.label} className="bg-[#0a0a0a] p-5 hover:bg-[#171717] transition">
                       <div className="text-2xl md:text-3xl font-bold text-foreground">
                         {f.value}
@@ -716,58 +637,6 @@ function Index() {
           </div>
         </section>
 
-        {/* SERVICES */}
-        <section id="services" className="max-w-7xl mx-auto px-4 sm:px-6 py-16 md:py-24">
-          <ScrollReveal>
-            <div className="flex items-center gap-3 mb-6">
-              <span className="font-mono text-xs text-[#a3a3a3] tracking-widest">✦ SERVICES</span>
-              <span className="h-px flex-1 bg-white/10" />
-            </div>
-            <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-12">
-              <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold">
-                <ShinyText text="What I do." />
-              </h2>
-              <p className="text-muted-foreground max-w-md">
-                Three disciplines, one workflow — engineered to ship products that feel cohesive end
-                to end.
-              </p>
-            </div>
-          </ScrollReveal>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            {services.map((s) => {
-              const Icon = s.icon;
-              return (
-                <ScrollReveal key={s.title}>
-                  <motion.div
-                    whileHover={{ y: -6 }}
-                    transition={{ duration: 0.3 }}
-                    className="group h-full rounded-2xl border border-white/10 bg-[#171717]/70 backdrop-blur-md p-8 shadow-[0_8px_32px_rgba(0,0,0,0.4)] hover:border-[#fafafa]/40 hover:bg-[#171717]/85 transition-all"
-                  >
-                    <div className="flex items-start mb-6">
-                      <div className="w-12 h-12 rounded-xl bg-[#fafafa]/10 border border-[#fafafa]/30 flex items-center justify-center text-[#fafafa] group-hover:bg-[#fafafa] group-hover:text-black transition">
-                        <Icon className="w-5 h-5" />
-                      </div>
-                    </div>
-                    <h3 className="text-2xl font-bold mb-3">{s.title}</h3>
-                    <p className="text-muted-foreground leading-relaxed mb-6">{s.desc}</p>
-                    <div className="flex flex-wrap gap-2">
-                      {s.tags.map((t) => (
-                        <span
-                          key={t}
-                          className="px-2.5 py-1 text-[11px] font-mono rounded-full border border-white/10 text-foreground/70"
-                        >
-                          {t}
-                        </span>
-                      ))}
-                    </div>
-                  </motion.div>
-                </ScrollReveal>
-              );
-            })}
-          </div>
-        </section>
-
         {/* PROJECTS */}
         <section id="projects" className="max-w-7xl mx-auto px-4 sm:px-6 py-16 md:py-24">
           <ScrollReveal>
@@ -816,36 +685,6 @@ function Index() {
               <ProjectGallery items={devProjects} />
             </>
           )}
-        </section>
-
-        {/* PROCESS */}
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 py-16 md:py-24">
-          <ScrollReveal>
-            <div className="flex items-center gap-3 mb-6">
-              <span className="font-mono text-xs text-[#a3a3a3] tracking-widest">✦ PROCESS</span>
-              <span className="h-px flex-1 bg-white/10" />
-            </div>
-            <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-12">
-              <ShinyText text="How I work." />
-            </h2>
-          </ScrollReveal>
-
-          <div className="grid md:grid-cols-4 gap-6">
-            {process.map((p, i) => (
-              <ScrollReveal key={p.step}>
-                <div className="h-full rounded-2xl border border-white/10 bg-[#171717]/70 backdrop-blur-md p-6 shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
-                  <div className="font-mono text-5xl font-bold text-[#fafafa]/20 mb-4">
-                    {p.step}
-                  </div>
-                  <h3 className="text-xl font-bold mb-2 flex items-center gap-2">
-                    {p.title}
-                    {i === 3 && <Sparkles className="w-4 h-4 text-[#fafafa]" />}
-                  </h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{p.desc}</p>
-                </div>
-              </ScrollReveal>
-            ))}
-          </div>
         </section>
 
         {/* CONTACT */}
