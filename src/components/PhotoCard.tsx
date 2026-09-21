@@ -42,7 +42,7 @@ export function PhotoCard() {
               Rizky Putra Ichfiandra
             </h3>
             <p className="text-xs md:text-sm font-mono text-foreground/60 mt-1">
-              Creative Developer · ID
+              FullStack Developer · Indonesia
             </p>
           </div>
 

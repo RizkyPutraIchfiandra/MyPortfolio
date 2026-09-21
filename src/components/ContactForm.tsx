@@ -2,9 +2,7 @@ import { useState, useRef, type FormEvent } from "react";
 import { motion } from "framer-motion";
 import { Send, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 
-// Ganti dengan Formspree form ID kamu
-// Daftar gratis di https://formspree.io → buat form → copy ID-nya
-const FORMSPREE_ID = "maqkegwl";
+const WEB3FORMS_KEY = "64701524-07cc-4555-901b-24a8ebc015d7";
 
 type Status = "idle" | "sending" | "success" | "error";
 
@@ -19,20 +17,31 @@ export function ContactForm() {
     setStatus("sending");
 
     try {
-      const res = await fetch(`https://formspree.io/f/${FORMSPREE_ID}`, {
+      const formData = new FormData(formRef.current);
+      const object = Object.fromEntries(formData);
+      const json = JSON.stringify(object);
+
+      const res = await fetch("https://api.web3forms.com/submit", {
         method: "POST",
-        body: new FormData(formRef.current),
-        headers: { Accept: "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: json,
       });
 
-      if (res.ok) {
+      const result = await res.json();
+
+      if (res.status === 200) {
         setStatus("success");
-        formRef.current.reset();
+        formRef.current.reset();  
         setTimeout(() => setStatus("idle"), 4000);
       } else {
-        throw new Error("Failed");
+        console.error(result);
+        throw new Error(result.message || "Failed");
       }
-    } catch {
+    } catch (err) {
+      console.error(err);
       setStatus("error");
       setTimeout(() => setStatus("idle"), 4000);
     }
@@ -46,6 +55,9 @@ export function ContactForm() {
       </p>
 
       <form ref={formRef} onSubmit={handleSubmit} className="space-y-5">
+        {/* Web3Forms Access Key */}
+        <input type="hidden" name="access_key" value={WEB3FORMS_KEY} />
+
         {/* Name */}
         <div>
           <label
@@ -56,7 +68,7 @@ export function ContactForm() {
           </label>
           <input
             id="contact-name"
-            name="from_name"
+            name="name"
             type="text"
             required
             placeholder="Your name"
@@ -74,7 +86,7 @@ export function ContactForm() {
           </label>
           <input
             id="contact-email"
-            name="from_email"
+            name="email"
             type="email"
             required
             placeholder="you@example.com"
