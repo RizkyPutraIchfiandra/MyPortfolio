@@ -180,6 +180,7 @@ const devProjects = [
     image: "/projects/personalityreranker.png",
     desc: "Bilingual AI response-quality classifier yang menilai kandidat balasan AI berdasarkan emotional appropriateness & kesesuaian nada. Didukung 4 model terlatih (mBERT fine-tuned, Small Transformer, Bi-LSTM, TF-IDF) untuk evaluasi respons hangat vs dingin secara real-time.",
     link: "https://ai-personality-reranker.vercel.app/",
+    repo: "https://github.com/syarofil42-gif/ai-personality-reranker",
     tags: ["mBERT", "Transformers", "NLP / AI", "React", "Bilingual ID/EN"],
     course: "AI · NLP",
     team: true,
