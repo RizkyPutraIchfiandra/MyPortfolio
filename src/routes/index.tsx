@@ -79,9 +79,9 @@ const skills = [
 ];
 
 const stats = [
-  { value: "2+", label: "Years coding" },
-  { value: "13", label: "Projects built" },
-  { value: "2+", label: "Clients" },
+  { value: "2", label: "Years coding" },
+  { value: "12", label: "Projects built" },
+  { value: "2", label: "Clients" },
   { value: "2", label: "SaaS in progress" },
 ];
 
