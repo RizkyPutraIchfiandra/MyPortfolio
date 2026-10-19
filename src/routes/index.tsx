@@ -166,7 +166,7 @@ const devProjects = [
     team: false,
   },
   {
-    title: "Finku",
+    title: "Finku — Money Tracker",
     image: "/projects/Finku.png",
     desc: "Jajan tracker yang ngitungin uangmu tiap hari — set uang jajan bulanan & limit harian, catat pengeluaran, lihat sisa budget hari ini.",
     link: "",
