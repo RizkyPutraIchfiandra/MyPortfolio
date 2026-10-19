@@ -482,10 +482,10 @@ function Index() {
               <ScrollReveal>
                 <div className="space-y-5 text-base md:text-lg leading-relaxed text-foreground/75 max-w-xl">
                   <p>
-                    I&apos;m <span className="text-foreground">Rizky Putra Ichfiandra</span>, a Computer Science student on the <span className="text-foreground font-medium">Software Engineering</span> track. I like being the one who takes an idea from a blank Figma canvas all the way to something people actually use.
+                    I&apos;m <span className="text-foreground">Rizky Putra Ichfiandra</span> — most people just call me Andra. Computer Science student, <span className="text-foreground font-medium">Software Engineering</span> track, and someone who genuinely can&apos;t leave an interface alone until it feels right.
                   </p>
                   <p>
-                    Lately that&apos;s meant wedding invitations for real weddings, face recognition for a campus attendance system, and a sentiment model small enough to run in a browser tab. Right now I&apos;m deep in two SaaS products, <span className="text-foreground">KARM</span> and <span className="text-foreground">SyncTrack</span>, and a research paper on reading sentiment out of informal Indonesian.
+                    I care about the small things: how a page loads, where the eye lands first, whether a button feels like it wants to be pressed. Design and code aren&apos;t separate jobs to me — they&apos;re the same decision made twice. I build, I break things, I read the docs at 2 AM, and I ship.
                   </p>
                 </div>
               </ScrollReveal>
