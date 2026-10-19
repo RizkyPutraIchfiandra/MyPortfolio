@@ -166,16 +166,6 @@ const devProjects = [
     team: false,
   },
   {
-    title: "Finku — Money Tracker",
-    image: "/projects/Finku.png",
-    desc: "Jajan tracker yang ngitungin uangmu tiap hari — set uang jajan bulanan & limit harian, catat pengeluaran, lihat sisa budget hari ini.",
-    link: "",
-    repo: "https://github.com/RizkyPutraIchfiandra/Finku-MoneyTracker",
-    tags: ["Expo", "React Native", "Supabase", "NativeWind", "TypeScript"],
-    course: "Mobile App · Personal Project",
-    team: false,
-  },
-  {
     title: "Moodreader",
     image: "/projects/Moodreader.png",
     desc: "Sentiment analysis pendeteksi mood — tempel review atau pesan bahasa Inggris/Indonesia, model TF-IDF + logistic regression menilai positif/negatif lengkap dengan tingkat keyakinan. Berjalan penuh di browser, tanpa backend.",
@@ -194,6 +184,16 @@ const devProjects = [
     tags: ["mBERT", "Transformers", "NLP / AI", "React", "Bilingual ID/EN"],
     course: "AI · NLP",
     team: true,
+  },
+  {
+    title: "Finku — Money Tracker",
+    image: "/projects/Finku.png",
+    desc: "Jajan tracker yang ngitungin uangmu tiap hari — set uang jajan bulanan & limit harian, catat pengeluaran, lihat sisa budget hari ini.",
+    link: "",
+    repo: "https://github.com/RizkyPutraIchfiandra/Finku-MoneyTracker",
+    tags: ["Expo", "React Native", "Supabase", "NativeWind", "TypeScript"],
+    course: "Mobile App · Personal Project",
+    team: false,
   },
   {
     title: "SiPresMa UCN",
