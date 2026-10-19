@@ -416,9 +416,9 @@ function Index() {
         <ScrollVelocity text="REACT ✦ NEXT.JS ✦ TYPESCRIPT ✦ TAILWIND ✦ FIGMA ✦ PYTHON ✦ POSTGRESQL ✦" />
 
         {/* ABOUT */}
-        <section id="about" className="relative max-w-7xl mx-auto px-4 sm:px-6 py-20 md:py-32">
+        <section id="about" className="relative max-w-7xl mx-auto px-4 sm:px-6 py-14 md:py-20">
           <ScrollReveal>
-            <div className="flex items-center gap-3 mb-16">
+            <div className="flex items-center gap-3 mb-10">
               <span className="font-mono text-xs text-[#a3a3a3] tracking-widest">✦ ABOUT</span>
               <span className="h-px flex-1 bg-white/10" />
             </div>
@@ -468,7 +468,7 @@ function Index() {
             </div>
 
             {/* RIGHT — editorial bio */}
-            <div className="md:col-span-7 space-y-12">
+            <div className="md:col-span-7 space-y-8">
               <ScrollReveal>
                 <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-[1.05] tracking-tight">
                   <span className="shiny-text">Hi — I&apos;m Andra.</span>
@@ -541,7 +541,7 @@ function Index() {
         </section>
 
         {/* EDUCATION */}
-        <section id="education" className="relative max-w-7xl mx-auto px-4 sm:px-6 py-20 md:py-32">
+        <section id="education" className="relative max-w-7xl mx-auto px-4 sm:px-6 py-14 md:py-20">
           <ScrollReveal>
             <div className="flex items-center gap-3 mb-10">
               <span className="font-mono text-xs text-[#a3a3a3] tracking-widest">✦ EDUCATION</span>
@@ -553,7 +553,7 @@ function Index() {
           </ScrollReveal>
 
           <ScrollReveal>
-            <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-8 mb-20">
+            <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-8 mb-12">
               <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.02] tracking-tight max-w-3xl">
                 <span className="shiny-text">
                   Where I learned <span className="italic font-display">the</span> craft.
@@ -573,7 +573,7 @@ Ten years between the first code editor and the last deploy.
               className="absolute left-4 md:left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-foreground/40 via-white/10 to-transparent md:-translate-x-px"
             />
 
-            <div className="space-y-16 md:space-y-24">
+            <div className="space-y-12 md:space-y-16">
               {education.map((e, i) => {
                 const flip = i % 2 === 1; // alternate sides on desktop
                 return (
@@ -699,7 +699,7 @@ Ten years between the first code editor and the last deploy.
         </section>
 
         {/* PROJECTS */}
-        <section id="projects" className="max-w-7xl mx-auto px-4 sm:px-6 py-16 md:py-24">
+        <section id="projects" className="max-w-7xl mx-auto px-4 sm:px-6 py-12 md:py-16">
           <ScrollReveal>
             <div className="flex items-center gap-3 mb-6">
               <span className="font-mono text-xs text-[#a3a3a3] tracking-widest">
@@ -749,7 +749,7 @@ Ten years between the first code editor and the last deploy.
         </section>
 
         {/* CONTACT */}
-        <section id="contact" className="max-w-7xl mx-auto px-4 sm:px-6 py-16 md:py-24">
+        <section id="contact" className="max-w-7xl mx-auto px-4 sm:px-6 py-12 md:py-16">
           <ScrollReveal>
             <div className="flex items-center gap-3 mb-6">
               <span className="font-mono text-xs text-[#a3a3a3] tracking-widest">✦ CONTACT</span>
