@@ -68,7 +68,7 @@ const skills = [
 
 const stats = [
   { value: "2+", label: "Years coding" },
-  { value: "11+", label: "Projects built" },
+  { value: "13+", label: "Projects built" },
   { value: "2+", label: "Clients" },
   { value: "∞", label: "Curiosity" },
 ];
@@ -114,6 +114,7 @@ const figmaProjects = [
     link: "https://www.figma.com/design/PLo1i68Tykas06BszTLkVJ/KIDDOVATE?node-id=0-1&p=f&t=hUbjfl5oLMOvbnoT-0",
     tags: ["Figma", "UI/UX", "Mobile App"],
     course: "Creativity & Innovation",
+    team: true,
   },
   {
     title: "AbleJobs",
@@ -122,6 +123,7 @@ const figmaProjects = [
     link: "https://www.figma.com/design/Tb7VR2FhQHqRECbV1m7SeL/AbleJobs?node-id=0-1&t=G5UetUDhV2hq04yK-1",
     tags: ["Figma", "UI/UX", "Web App", "WCAG"],
     course: "Human & Computer Interaction",
+    team: true,
   },
   {
     title: "EduPulse Indonesia",
@@ -130,6 +132,7 @@ const figmaProjects = [
     link: "https://www.figma.com/design/HXOMnVs96mI6dvbALTjcYt/EduPulse?node-id=0-1&t=GprvhTVMFFcwhhaz-1",
     tags: ["Figma", "UI/UX", "Web App"],
     course: "Software Engineering",
+    team: true,
   },
   {
     title: "Rubesa",
@@ -138,6 +141,7 @@ const figmaProjects = [
     link: "https://www.figma.com/design/VvQe6wAzlo5rLVGWLbQgzk/RUBESA---Anita-Max-Wynn?node-id=19-2689&t=10QZJoqKRoLD7dtj-0",
     tags: ["Figma", "UI/UX", "Mobile App", "EdTech"],
     course: "TechFest 2025 · HIMTI Binus",
+    team: false,
   },
   {
     title: "FontDale",
@@ -146,10 +150,31 @@ const figmaProjects = [
     link: "https://www.figma.com/design/it07g3x0e2HxgcZfPid1d2/Project-HCI-Lab?node-id=15-6&t=EZWLShpVWamYUbF4-1",
     tags: ["Figma", "UI/UX", "Web App"],
     course: "HCI Laboratorium",
+    team: false,
   },
 ];
 
 const devProjects = [
+  {
+    title: "Finku",
+    image: "/projects/Finku.png",
+    desc: "Jajan tracker yang ngitungin uangmu tiap hari — set uang jajan bulanan & limit harian, catat pengeluaran, lihat sisa budget hari ini.",
+    link: "",
+    repo: "https://github.com/RizkyPutraIchfiandra/finku",
+    tags: ["Expo", "React Native", "Supabase", "NativeWind", "TypeScript"],
+    course: "Mobile App · Personal Project",
+    team: false,
+  },
+  {
+    title: "Moodreader",
+    image: "/projects/Moodreader.png",
+    desc: "Sentiment analysis pendeteksi mood — tempel review atau pesan bahasa Inggris/Indonesia, model TF-IDF + logistic regression menilai positif/negatif lengkap dengan tingkat keyakinan. Berjalan penuh di browser, tanpa backend.",
+    link: "https://moodreader.netlify.app/",
+    repo: "https://github.com/RizkyPutraIchfiandra/Moodreader",
+    tags: ["React", "scikit-learn", "TF-IDF", "Python", "No Backend"],
+    course: "Web App · Personal Project",
+    team: false,
+  },
   {
     title: "Personality Reranker",
     image: "/projects/personalityreranker.png",
@@ -157,6 +182,7 @@ const devProjects = [
     link: "https://ai-personality-reranker.vercel.app/",
     tags: ["mBERT", "Transformers", "NLP / AI", "React", "Bilingual ID/EN"],
     course: "AI · NLP",
+    team: true,
   },
   {
     title: "SiPresMa UCN",
@@ -165,6 +191,7 @@ const devProjects = [
     link: "https://sipresma-ucn.vercel.app/",
     tags: ["Next.js 14", "face-api.js", "PostgreSQL", "Prisma", "NextAuth"],
     course: "Full-stack · ML",
+    team: false,
   },
   {
     title: "Malazzz — YouTuber Website",
@@ -173,6 +200,7 @@ const devProjects = [
     link: "https://aku-malazzz.vercel.app/",
     tags: ["React", "API Integration", "Real-time Stats"],
     course: "Personal Project",
+    team: false,
   },
   {
     title: "EduPulse Indonesia",
@@ -181,6 +209,7 @@ const devProjects = [
     link: "https://edupulse-indonesia.vercel.app/",
     tags: ["React", "Vercel", "Full-stack"],
     course: "Software Engineering",
+    team: true,
   },
   {
     title: "Needleman-Wunsch Algorithm",
@@ -189,6 +218,7 @@ const devProjects = [
     link: "https://needleman-wunsch-algorithm.netlify.app/",
     tags: ["React", "Algorithm", "Bioinformatics"],
     course: "Collaborative Project",
+    team: false,
   },
   {
     title: "UPGMA Phylogenetic Tree",
@@ -197,6 +227,7 @@ const devProjects = [
     link: "https://upgma-phylogenetic.netlify.app/",
     tags: ["React", "Algorithm", "Bioinformatics", "Data Viz"],
     course: "Bioinformatics",
+    team: false,
   },
 ];
 
