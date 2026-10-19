@@ -68,7 +68,7 @@ const skills = [
 
 const stats = [
   { value: "2+", label: "Years coding" },
-  { value: "13+", label: "Projects built" },
+  { value: "12", label: "Projects built" },
   { value: "2+", label: "Clients" },
   { value: "∞", label: "Curiosity" },
 ];
@@ -160,7 +160,7 @@ const devProjects = [
     image: "/projects/Finku.png",
     desc: "Jajan tracker yang ngitungin uangmu tiap hari — set uang jajan bulanan & limit harian, catat pengeluaran, lihat sisa budget hari ini.",
     link: "",
-    repo: "https://github.com/RizkyPutraIchfiandra/finku",
+    repo: "https://github.com/RizkyPutraIchfiandra/Finku-MoneyTracker",
     tags: ["Expo", "React Native", "Supabase", "NativeWind", "TypeScript"],
     course: "Mobile App · Personal Project",
     team: false,
@@ -218,10 +218,11 @@ const devProjects = [
   {
     title: "Needleman-Wunsch Algorithm",
     image: "/projects/needleman-wunsch.png",
-    desc: "Web app untuk menghitung DNA Sequence Alignment menggunakan algoritma Needleman-Wunsch — dibuat bareng Muhammad Raid Zakwan.",
+    desc: "Web app untuk menghitung DNA Sequence Alignment menggunakan algoritma Needleman-Wunsch — scoring matrix, traceback, dan hasil alignment optimal antar dua sekuens.",
     link: "https://needleman-wunsch-algorithm.netlify.app/",
+    repo: "https://github.com/RizkyPutraIchfiandra/Needleman-Wunsch-Algorithm",
     tags: ["React", "Algorithm", "Bioinformatics"],
-    course: "Collaborative Project",
+    course: "Bioinformatics",
     team: false,
   },
   {
