@@ -482,10 +482,10 @@ function Index() {
               <ScrollReveal>
                 <div className="space-y-5 text-base md:text-lg leading-relaxed text-foreground/75 max-w-xl">
                   <p>
-                    <span className="text-foreground">Rizky Putra Ichfiandra</span> — Computer Science undergraduate on the <span className="text-foreground font-medium">Software Engineering</span> track. I design the interface in Figma, then write the code that puts it in production. Same person, both ends.
+                    I&apos;m <span className="text-foreground">Rizky Putra Ichfiandra</span>, a Computer Science student on the <span className="text-foreground font-medium">Software Engineering</span> track. I like being the one who takes an idea from a blank Figma canvas all the way to something people actually use.
                   </p>
                   <p>
-                    A bilingual wedding invitation serving 205 guests. A face-recognition attendance system that stores descriptors, never photos. A sentiment classifier running entirely in the browser with no backend to host. Currently building two SaaS products, <span className="text-foreground">KARM</span> and <span className="text-foreground">SyncTrack</span>, while researching aspect-based sentiment analysis for informal Indonesian text.
+                    Lately that&apos;s meant wedding invitations for real weddings, face recognition for a campus attendance system, and a sentiment model small enough to run in a browser tab. Right now I&apos;m deep in two SaaS products, <span className="text-foreground">KARM</span> and <span className="text-foreground">SyncTrack</span>, and a research paper on reading sentiment out of informal Indonesian.
                   </p>
                 </div>
               </ScrollReveal>
