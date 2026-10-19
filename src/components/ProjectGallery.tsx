@@ -48,7 +48,7 @@ export function ProjectGallery({ items }: ProjectGalleryProps) {
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* filter pills */}
       <div className="flex flex-wrap gap-2">
         {FILTERS.map((f) => (
@@ -72,7 +72,7 @@ export function ProjectGallery({ items }: ProjectGalleryProps) {
       </div>
 
       {/* gallery */}
-      <div className="h-[420px] md:h-[520px]">
+      <div className="h-[280px] md:h-[400px]">
         <CircularGallery
           items={galleryItems}
           bend={0}
