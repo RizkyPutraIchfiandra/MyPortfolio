@@ -25,6 +25,12 @@ import {
   SiGithub,
   SiVercel,
   SiNetlify,
+  SiSupabase,
+  SiExpo,
+  SiFramer,
+  SiScikitlearn,
+  SiShadcnui,
+  SiVite,
 } from "react-icons/si";
 import ShapeGrid from "@/components/effects/ShapeGrid.jsx";
 import { PhotoCard } from "@/components/PhotoCard";
@@ -56,10 +62,16 @@ const skills = [
   { Icon: SiReact, label: "React", color: "#61DAFB" },
   { Icon: SiNextdotjs, label: "Next.js", color: "#ffffff" },
   { Icon: SiTypescript, label: "TypeScript", color: "#3178C6" },
+  { Icon: SiVite, label: "Vite", color: "#646CFF" },
   { Icon: SiTailwindcss, label: "Tailwind CSS", color: "#06B6D4" },
+  { Icon: SiShadcnui, label: "shadcn/ui", color: "#ffffff" },
+  { Icon: SiFramer, label: "Framer Motion", color: "#0055FF" },
+  { Icon: SiSupabase, label: "Supabase", color: "#3FCF8E" },
   { Icon: SiPostgresql, label: "PostgreSQL", color: "#4169E1" },
-  { Icon: SiPrisma, label: "Prisma", color: "#2D3748" },
-  { Icon: SiPython, label: "Python & NLP", color: "#3776AB" },
+  { Icon: SiPrisma, label: "Prisma", color: "#5A67D8" },
+  { Icon: SiExpo, label: "Expo", color: "#ffffff" },
+  { Icon: SiPython, label: "Python", color: "#3776AB" },
+  { Icon: SiScikitlearn, label: "scikit-learn", color: "#F7931E" },
   { Icon: SiFigma, label: "Figma", color: "#F24E1E" },
   { Icon: SiGithub, label: "GitHub", color: "#ffffff" },
   { Icon: SiVercel, label: "Vercel", color: "#ffffff" },
@@ -70,7 +82,7 @@ const stats = [
   { value: "2+", label: "Years coding" },
   { value: "13", label: "Projects built" },
   { value: "2+", label: "Clients" },
-  { value: "∞", label: "Curiosity" },
+  { value: "2", label: "SaaS in progress" },
 ];
 
 const education = [
@@ -81,7 +93,7 @@ const education = [
     level: "S1 · Bachelor's Degree",
     institution: "Computer Science",
     focus: "Software Engineering",
-    desc: "Pursuing a Bachelor's in Computer Science with a focus on Software Engineering — diving deep into systems, architecture, and building things that scale.",
+    desc: "Computer Science, Software Engineering track. Where most of what I know about systems and architecture actually got tested.",
     isCurrent: true,
   },
   {
@@ -91,7 +103,7 @@ const education = [
     level: "SMA · Senior High School",
     institution: "SMAN 1 Cibinong",
     focus: "MIPA (Mathematics & Natural Sciences)",
-    desc: "Majored in MIPA, where curiosity for problem-solving and the science behind every system first took shape.",
+    desc: "MIPA major. Math and physics, three years of it. Turned out to be good practice for debugging.",
     isCurrent: false,
   },
   {
@@ -101,7 +113,7 @@ const education = [
     level: "SMP · Junior High School",
     institution: "SMP SMART Cibinong",
     focus: "General Studies",
-    desc: "The early years — where foundations for analytical thinking, discipline, and a love for tinkering started.",
+    desc: "First time I opened a code editor. Nothing I made then still runs, but it started here.",
     isCurrent: false,
   },
 ];
@@ -436,11 +448,11 @@ function Index() {
                   <ul className="space-y-2.5 font-mono text-sm">
                     <li className="flex items-start gap-3">
                       <span className="text-foreground/40 shrink-0 w-20">building</span>
-                      <span className="text-foreground/90">KARM Web Project</span>
+                      <span className="text-foreground/90">KARM — SaaS</span>
                     </li>
                     <li className="flex items-start gap-3">
-                      <span className="text-foreground/40 shrink-0 w-20">research</span>
-                      <span className="text-foreground/90">Research Methodology</span>
+                      <span className="text-foreground/40 shrink-0 w-20">building</span>
+                      <span className="text-foreground/90">SyncTrack — SaaS</span>
                     </li>
                     <li className="flex items-start gap-3">
                       <span className="text-foreground/40 shrink-0 w-20">studying</span>
@@ -458,7 +470,7 @@ function Index() {
                   <span className="shiny-text">Hi — I&apos;m Andra.</span>
                   <br />
                   <span className="text-foreground/55">
-                    Turning ideas into clean code and intuitive designs.
+                    I build web apps, and I ship them.
                   </span>
                 </h2>
               </ScrollReveal>
@@ -466,10 +478,10 @@ function Index() {
               <ScrollReveal>
                 <div className="space-y-5 text-base md:text-lg leading-relaxed text-foreground/75 max-w-xl">
                   <p>
-                    Nama lengkap <span className="text-foreground">Rizky Putra Ichfiandra</span>. Mahasiswa <span className="text-foreground font-medium">Computer Science (Software Engineering)</span> yang antusias menggabungkan estetika UI/UX dengan arsitektur software yang solid dan scalable.
+                    Nama lengkap <span className="text-foreground">Rizky Putra Ichfiandra</span>. Mahasiswa <span className="text-foreground font-medium">Computer Science (Software Engineering)</span>. Saya desain di Figma, lalu saya sendiri yang ngoding sampai jalan di production.
                   </p>
                   <p>
-                    Mulai dari eksplorasi desain di Figma, implementasi web app modern berbasis React &amp; Next.js, hingga eksplorasi algoritma dan model AI/NLP. Bagi saya, setiap project adalah wadah untuk bereksperimen, belajar mendalam, dan menghasilkan produk digital yang bermanfaat.
+                    Undangan pernikahan yang dipakai 205 tamu. Sistem presensi wajah untuk kampus. Model sentiment analysis yang jalan tanpa backend. Sekarang sedang bangun dua SaaS: <span className="text-foreground">KARM</span> dan <span className="text-foreground">SyncTrack</span>.
                   </p>
                 </div>
               </ScrollReveal>
@@ -544,8 +556,7 @@ function Index() {
                 </span>
               </h2>
               <p className="text-muted-foreground max-w-xs text-base leading-relaxed">
-                Every chapter shaped how I think, debug, and build today — from the first SMP
-                classroom to writing software at university.
+Ten years between the first code editor and the last deploy.
               </p>
             </div>
           </ScrollReveal>
@@ -697,7 +708,7 @@ function Index() {
                 <ShinyText text="Selected work." />
               </h2>
               <p className="text-muted-foreground max-w-md">
-                From design explorations to production code — here's what I've been building.
+                Figma files and shipped code. Both below.
               </p>
             </div>
           </ScrollReveal>
