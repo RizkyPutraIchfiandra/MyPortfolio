@@ -416,7 +416,7 @@ function Index() {
         <ScrollVelocity text="REACT ✦ NEXT.JS ✦ TYPESCRIPT ✦ TAILWIND ✦ FIGMA ✦ PYTHON ✦ POSTGRESQL ✦" />
 
         {/* ABOUT */}
-        <section id="about" className="relative max-w-7xl mx-auto px-4 sm:px-6 py-14 md:py-20">
+        <section id="about" className="relative max-w-7xl mx-auto px-4 sm:px-6 py-8 md:py-12">
           <ScrollReveal>
             <div className="flex items-center gap-3 mb-10">
               <span className="font-mono text-xs text-[#a3a3a3] tracking-widest">✦ ABOUT</span>
@@ -541,7 +541,7 @@ function Index() {
         </section>
 
         {/* EDUCATION */}
-        <section id="education" className="relative max-w-7xl mx-auto px-4 sm:px-6 py-14 md:py-20">
+        <section id="education" className="relative max-w-7xl mx-auto px-4 sm:px-6 py-8 md:py-12">
           <ScrollReveal>
             <div className="flex items-center gap-3 mb-10">
               <span className="font-mono text-xs text-[#a3a3a3] tracking-widest">✦ EDUCATION</span>
@@ -699,7 +699,7 @@ Ten years between the first code editor and the last deploy.
         </section>
 
         {/* PROJECTS */}
-        <section id="projects" className="max-w-7xl mx-auto px-4 sm:px-6 py-12 md:py-16">
+        <section id="projects" className="max-w-7xl mx-auto px-4 sm:px-6 py-8 md:py-12">
           <ScrollReveal>
             <div className="flex items-center gap-3 mb-6">
               <span className="font-mono text-xs text-[#a3a3a3] tracking-widest">
@@ -749,7 +749,7 @@ Ten years between the first code editor and the last deploy.
         </section>
 
         {/* CONTACT */}
-        <section id="contact" className="max-w-7xl mx-auto px-4 sm:px-6 py-12 md:py-16">
+        <section id="contact" className="max-w-7xl mx-auto px-4 sm:px-6 py-8 md:py-12">
           <ScrollReveal>
             <div className="flex items-center gap-3 mb-6">
               <span className="font-mono text-xs text-[#a3a3a3] tracking-widest">✦ CONTACT</span>
