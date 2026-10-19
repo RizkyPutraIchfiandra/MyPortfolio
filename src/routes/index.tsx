@@ -455,6 +455,10 @@ function Index() {
                       <span className="text-foreground/90">SyncTrack — SaaS</span>
                     </li>
                     <li className="flex items-start gap-3">
+                      <span className="text-foreground/40 shrink-0 w-20">research</span>
+                      <span className="text-foreground/90">ABSA on Informal Indonesian · mBERT</span>
+                    </li>
+                    <li className="flex items-start gap-3">
                       <span className="text-foreground/40 shrink-0 w-20">studying</span>
                       <span className="text-foreground/90">Computer Science · Software Engineering</span>
                     </li>
@@ -478,10 +482,10 @@ function Index() {
               <ScrollReveal>
                 <div className="space-y-5 text-base md:text-lg leading-relaxed text-foreground/75 max-w-xl">
                   <p>
-                    Nama lengkap <span className="text-foreground">Rizky Putra Ichfiandra</span>. Mahasiswa <span className="text-foreground font-medium">Computer Science (Software Engineering)</span>. Saya desain di Figma, lalu saya sendiri yang ngoding sampai jalan di production.
+                    <span className="text-foreground">Rizky Putra Ichfiandra</span> — Computer Science undergraduate on the <span className="text-foreground font-medium">Software Engineering</span> track. I design the interface in Figma, then write the code that puts it in production. Same person, both ends.
                   </p>
                   <p>
-                    Undangan pernikahan yang dipakai 205 tamu. Sistem presensi wajah untuk kampus. Model sentiment analysis yang jalan tanpa backend. Sekarang sedang bangun dua SaaS: <span className="text-foreground">KARM</span> dan <span className="text-foreground">SyncTrack</span>.
+                    A bilingual wedding invitation serving 205 guests. A face-recognition attendance system that stores descriptors, never photos. A sentiment classifier running entirely in the browser with no backend to host. Currently building two SaaS products, <span className="text-foreground">KARM</span> and <span className="text-foreground">SyncTrack</span>, while researching aspect-based sentiment analysis for informal Indonesian text.
                   </p>
                 </div>
               </ScrollReveal>
