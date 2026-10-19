@@ -474,7 +474,7 @@ function Index() {
                   <span className="shiny-text">Hi — I&apos;m Andra.</span>
                   <br />
                   <span className="text-foreground/55">
-                    I build web apps, and I ship them.
+                    I care how it works. I care more how it feels.
                   </span>
                 </h2>
               </ScrollReveal>
