@@ -68,7 +68,7 @@ const skills = [
 
 const stats = [
   { value: "2+", label: "Years coding" },
-  { value: "12", label: "Projects built" },
+  { value: "13", label: "Projects built" },
   { value: "2+", label: "Clients" },
   { value: "∞", label: "Curiosity" },
 ];
@@ -155,6 +155,16 @@ const figmaProjects = [
 ];
 
 const devProjects = [
+  {
+    title: "WebNikahV2 — Dimas & Intan",
+    image: "/projects/WebNikahV2.png",
+    desc: "Undangan pernikahan digital dwibahasa bertema Botanical Luxury — link personal per tamu, hitung mundur ke hari H, peta lokasi, RSVP realtime via Supabase, dan pemutar musik. Dipakai sungguhan untuk 205 tamu.",
+    link: "https://dimas-intan.vercel.app",
+    repo: "https://github.com/RizkyPutraIchfiandra/WebNikahV2",
+    tags: ["React 19", "TypeScript", "Supabase", "Framer Motion", "Leaflet"],
+    course: "Client Project",
+    team: false,
+  },
   {
     title: "Finku",
     image: "/projects/Finku.png",
