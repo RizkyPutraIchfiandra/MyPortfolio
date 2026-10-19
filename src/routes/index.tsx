@@ -217,7 +217,7 @@ const devProjects = [
   },
   {
     title: "Needleman-Wunsch Algorithm",
-    image: "/projects/needleman-wunsch.png.png",
+    image: "/projects/needleman-wunsch.png",
     desc: "Web app untuk menghitung DNA Sequence Alignment menggunakan algoritma Needleman-Wunsch — dibuat bareng Muhammad Raid Zakwan.",
     link: "https://needleman-wunsch-algorithm.netlify.app/",
     tags: ["React", "Algorithm", "Bioinformatics"],
