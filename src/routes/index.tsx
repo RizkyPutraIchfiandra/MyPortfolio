@@ -12,6 +12,7 @@ import {
   MapPin,
   GraduationCap,
   BrainCircuit,
+  FileText,
 } from "lucide-react";
 import {
   SiReact,
@@ -372,10 +373,13 @@ function Index() {
                 <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
               </a>
               <a
-                href="#contact"
+                href="/CV-Rizky-Putra-Ichfiandra.pdf"
+                target="_blank"
+                rel="noreferrer"
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-lg border border-white/20 hover:border-[#a3a3a3] hover:text-[#a3a3a3] transition"
               >
-                Get in Touch
+                <FileText className="w-4 h-4" />
+                Download CV
               </a>
             </div>
 
